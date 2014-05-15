@@ -9,14 +9,14 @@ import javax.ws.rs.core.Response;
 @Path("/")
 public class HomeResource {
 
-	public HomeResource() {
-		// TODO Auto-generated constructor stub
-	}
+    public HomeResource() {
+        // TODO Auto-generated constructor stub
+    }
 
-	@GET
-	@Produces(MediaType.TEXT_HTML)
-	public Response home() {
-		return Response.ok("Yay").build();
-	}
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response home() {
+        return Response.ok("Yay").build();
+    }
 
 }

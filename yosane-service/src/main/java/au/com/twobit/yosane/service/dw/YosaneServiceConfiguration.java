@@ -4,8 +4,8 @@ import io.dropwizard.Configuration;
 
 public class YosaneServiceConfiguration extends Configuration {
 
-	public YosaneServiceConfiguration() {
-		// TODO Auto-generated constructor stub
-	}
+    public YosaneServiceConfiguration() {
+        // TODO Auto-generated constructor stub
+    }
 
 }

@@ -8,9 +8,9 @@ import com.google.common.hash.Hashing;
 
 public class UUIDTicketGenerator implements TicketGenerator {
 
-	@Override
-	public String newTicket() {
-		return Hashing.md5().hashString(UUID.randomUUID().toString(), Charset.defaultCharset()).toString();
-	}
+    @Override
+    public String newTicket() {
+        return Hashing.md5().hashString(UUID.randomUUID().toString(), Charset.defaultCharset()).toString();
+    }
 
 }

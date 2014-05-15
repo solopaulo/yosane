@@ -16,36 +16,36 @@ import com.google.inject.name.Names;
 
 public class YosaneGuiceModule extends AbstractModule {
 
-	public YosaneGuiceModule() {
-	}
+    public YosaneGuiceModule() {
+    }
 
-	@Override
-	protected void configure() {
-		// register a ticket generator
-		bind(TicketGenerator.class).to(UUIDTicketGenerator.class);
+    @Override
+    protected void configure() {
+        // register a ticket generator
+        bind(TicketGenerator.class).to(UUIDTicketGenerator.class);
 
-		// start a new executor service for background tasks
-		int maxThreads = 3;
-		final ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
-		bind(ExecutorService.class).toInstance(executorService);
-		bind(Managed.class).annotatedWith(Names.named("async")).toInstance(new Managed() {
-			@Override
-			public void start() throws Exception {
-			}
+        // start a new executor service for background tasks
+        int maxThreads = 3;
+        final ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
+        bind(ExecutorService.class).toInstance(executorService);
+        bind(Managed.class).annotatedWith(Names.named("async")).toInstance(new Managed() {
+            @Override
+            public void start() throws Exception {
+            }
 
-			@Override
-			public void stop() throws Exception {
-				executorService.shutdown();
-			}
-		});
+            @Override
+            public void stop() throws Exception {
+                executorService.shutdown();
+            }
+        });
 
-		// configure the sane dependencies
-		install(new SaneDependencyModule());
-		// set up some constants
-		bind(String.class).annotatedWith(Names.named("holdingArea")).toInstance("/tmp/yosane/");
-		bind(String.class).annotatedWith(Names.named("imageOutputFormat")).toInstance(ImageFormat.png.name());
-		// register the file storage class for image persistence
-		bind(Storage.class).to(FileStorage.class);
-	}
+        // configure the sane dependencies
+        install(new SaneDependencyModule());
+        // set up some constants
+        bind(String.class).annotatedWith(Names.named("holdingArea")).toInstance("/tmp/yosane/");
+        bind(String.class).annotatedWith(Names.named("imageOutputFormat")).toInstance(ImageFormat.png.name());
+        // register the file storage class for image persistence
+        bind(Storage.class).to(FileStorage.class);
+    }
 
 }

@@ -6,10 +6,10 @@ import com.google.common.base.Function;
 
 public class TransformDeviceOptionToSaneOption implements Function<DeviceOption, Object> {
 
-	@Override
-	public Object apply(DeviceOption option) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Object apply(DeviceOption option) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
