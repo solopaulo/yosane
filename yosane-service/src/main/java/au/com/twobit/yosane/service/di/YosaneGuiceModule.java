@@ -1,9 +1,16 @@
 package au.com.twobit.yosane.service.di;
 
 
+import io.dropwizard.lifecycle.Managed;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.storage.FileStorage;
 import au.com.twobit.yosane.service.storage.Storage;
+import au.com.twobit.yosane.service.utils.TicketGenerator;
+import au.com.twobit.yosane.service.utils.UUIDTicketGenerator;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -15,6 +22,24 @@ public class YosaneGuiceModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		// register a ticket generator
+		bind(TicketGenerator.class).to(UUIDTicketGenerator.class);
+
+		// start a new executor service for background tasks
+		int maxThreads = 3;
+		final ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
+		bind(ExecutorService.class).toInstance( executorService );
+		bind(Managed.class).annotatedWith(Names.named("async")).toInstance( new Managed() {
+			@Override
+			public void start() throws Exception {
+			}
+
+			@Override
+			public void stop() throws Exception {
+				executorService.shutdown();
+			}
+		});
+		
 		// configure the sane dependencies
 		install(new SaneDependencyModule());
 		// set up some constants

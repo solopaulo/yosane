@@ -1,14 +1,11 @@
 package au.com.twobit.yosane.service.resource;
 
+import static au.com.twobit.yosane.service.image.ImageFormat.png;
+import static au.com.twobit.yosane.service.image.ImageUtils.createByteArrayFromImage;
 import io.dropwizard.jersey.caching.CacheControl;
-import static au.com.twobit.yosane.service.image.ImageUtils.*;
-import static au.com.twobit.yosane.service.image.ImageFormat.*;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeUnit;
 
-import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,10 +15,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import au.com.twobit.yosane.service.image.ImageFormat;
+import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.service.storage.Storage;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
 @Path("/images")
@@ -36,8 +32,9 @@ public class ImagesResource {
 	
 	@GET
 	@Path("/{imageId}")
-	public Response getImageDetails(@PathParam("imageId") String imageId) {
-		return Response.serverError().build();
+	public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
+		ImageStatus status = storage.getStatus(imageIdentifier);
+		return Response.ok(status.name()).build();
 	}
 	
 	@GET
@@ -48,7 +45,7 @@ public class ImagesResource {
 		try { 
 			return Response
 					.ok()
-					.entity(  createByteArrayFromImage(storage.loadImage(imageId), png.name()) )
+					.entity( createByteArrayFromImage(storage.loadImage(imageId), png.name()) )
 					.build();
 		} catch (Exception x) { x.printStackTrace(); }
 		return Response.ok().build();            

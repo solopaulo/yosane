@@ -3,12 +3,12 @@ package au.com.twobit.yosane.api;
 public class Image {
 	private String identifier;
 	private String outputFormat;
-	private String status;
+	private ImageStatus status;
 	
-	public String getStatus() {
+	public ImageStatus getStatus() {
 		return status;
 	}
-	public void setStatus(String status) {
+	public void setStatus(ImageStatus status) {
 		this.status = status;
 	}
 	public String getIdentifier() {

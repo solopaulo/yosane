@@ -106,7 +106,7 @@ public class SaneScanHardware implements ScanHardware {
 	}
 
 	@Override
-	public BufferedImage acquireImage(String scanDeviceIdentifier, DeviceOption ... options) throws AcquisitionException {
+	public BufferedImage acquireImage(String scanDeviceIdentifier, String ticket, DeviceOption ... options) throws AcquisitionException {
 		// check if scanner is available
 		if ( ! scannerIsAvailable(scanDeviceIdentifier) ) {
 			throw new AcquisitionException(String.format("Device is busy: %s",scanDeviceIdentifier));
