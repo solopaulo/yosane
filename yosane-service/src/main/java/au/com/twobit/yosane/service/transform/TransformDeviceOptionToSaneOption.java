@@ -4,8 +4,7 @@ import au.com.twobit.yosane.api.DeviceOption;
 
 import com.google.common.base.Function;
 
-public class TransformDeviceOptionToSaneOption implements
-		Function<DeviceOption, Object> {
+public class TransformDeviceOptionToSaneOption implements Function<DeviceOption, Object> {
 
 	@Override
 	public Object apply(DeviceOption option) {

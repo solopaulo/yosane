@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 public class ScannersAvailable extends HealthCheck {
 
 	private ScanHardware hardware = null;
+
 	public ScannersAvailable() {
 		super();
 	}
@@ -17,11 +18,11 @@ public class ScannersAvailable extends HealthCheck {
 		super();
 		this.hardware = hardware;
 	}
-	
+
 	@Override
 	protected Result check() throws Exception {
 		try {
-			if ( hardware.getListOfScanDevices().size() > 0 ) {
+			if (hardware.getListOfScanDevices().size() > 0) {
 				return Result.healthy();
 			}
 			throw new Exception("There are no scanning devices available");
@@ -29,6 +30,5 @@ public class ScannersAvailable extends HealthCheck {
 			return Result.unhealthy(x.getMessage());
 		}
 	}
-	
 
 }

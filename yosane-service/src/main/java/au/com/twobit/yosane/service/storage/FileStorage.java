@@ -20,99 +20,91 @@ public class FileStorage implements Storage {
 	private final static String IMAGE_FILE_NAME = "image";
 	private final static String THUMB_FILE_NAME = "thumb";
 	private final static String STATUS_FILE_NAME = "status";
-	
+
 	@Inject
-	public FileStorage(@Named("holdingArea") String holdingArea, 
-					   @Named("imageOutputFormat") String imageOutputFormat) {
+	public FileStorage(@Named("holdingArea") String holdingArea, @Named("imageOutputFormat") String imageOutputFormat) {
 		this.holdingArea = holdingArea;
 		this.imageOutputFormat = imageOutputFormat;
 	}
-	
-	
+
 	@Override
-	public void saveImage(BufferedImage image,String imageIdentifier) throws StorageException {
-		save(image,imageIdentifier,IMAGE_FILE_NAME);
+	public void saveImage(BufferedImage image, String imageIdentifier) throws StorageException {
+		save(image, imageIdentifier, IMAGE_FILE_NAME);
 	}
-	
 
 	@Override
 	public void saveImageThumbnail(BufferedImage image, String imageIdentifier) throws StorageException {
-		save(image,imageIdentifier,THUMB_FILE_NAME);
+		save(image, imageIdentifier, THUMB_FILE_NAME);
 	}
-	
 
 	void save(BufferedImage image, String imageIdentifier, String filename) throws StorageException {
 		File imagedir = getImageAreaDirectory(imageIdentifier);
 		// determine the path of the file
-		String imageFilePath = Joiner.on(File.separator).join(imagedir.getPath(),filename);
+		String imageFilePath = Joiner.on(File.separator).join(imagedir.getPath(), filename);
 		// write the image data to disk
 		try {
-			if ( image != null ) ImageIO.write(image, imageOutputFormat, new File(imageFilePath));
+			if (image != null)
+				ImageIO.write(image, imageOutputFormat, new File(imageFilePath));
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new StorageException("Failed to write file to disk: "+e.getMessage());
-		}	
+			throw new StorageException("Failed to write file to disk: " + e.getMessage());
+		}
 	}
-	
-	
+
 	@Override
 	public BufferedImage loadImage(String imageIdentifier) throws StorageException {
 		return load(imageIdentifier, IMAGE_FILE_NAME);
 	}
 
-
-
-
 	@Override
 	public BufferedImage loadImageThumbnail(String imageIdentifier) throws StorageException {
 		return load(imageIdentifier, THUMB_FILE_NAME);
 	}
-	
+
 	BufferedImage load(String imageIdentifier, String filename) throws StorageException {
 		File imagedir = getImageAreaDirectory(imageIdentifier);
-		String filepath = Joiner.on(File.separator).join(imagedir.getPath(),filename);
+		String filepath = Joiner.on(File.separator).join(imagedir.getPath(), filename);
 		File file = new File(filepath);
 		try {
-			return ImageIO.read(file);	
+			return ImageIO.read(file);
 		} catch (Exception x) {
 			x.printStackTrace();
 		}
-		throw new StorageException("Unable to read from file with identifier "+imageIdentifier);
+		throw new StorageException("Unable to read from file with identifier " + imageIdentifier);
 	}
-
 
 	@Override
 	public void updateStatus(ImageStatus status, String imageIdentifier) throws StorageException {
 		File imagedir = getImageAreaDirectory(imageIdentifier);
-		String filepath = Joiner.on(File.separator).join(imagedir.getPath(),STATUS_FILE_NAME);
+		String filepath = Joiner.on(File.separator).join(imagedir.getPath(), STATUS_FILE_NAME);
 		try {
-			Files.write(status.name().getBytes(),  new File(filepath));
-		} catch(Exception x) {
+			Files.write(status.name().getBytes(), new File(filepath));
+		} catch (Exception x) {
 			// log an error
 			throw new StorageException(x.getMessage());
 		}
 	}
 
-
 	@Override
 	public ImageStatus getStatus(String imageIdentifier) throws StorageException {
-		String filepath = Joiner.on(File.separator).join(holdingArea,imageIdentifier,STATUS_FILE_NAME);
+		String filepath = Joiner.on(File.separator).join(holdingArea, imageIdentifier, STATUS_FILE_NAME);
 		try {
-			return ImageStatus.valueOf( Files.toString( new File(filepath), Charset.defaultCharset()));
-		} catch (Exception x) { }
+			return ImageStatus.valueOf(Files.toString(new File(filepath), Charset.defaultCharset()));
+		} catch (Exception x) {
+		}
 		return ImageStatus.FAILED;
 	}
-	
+
 	File getImageAreaDirectory(String imageIdentifier) throws StorageException {
 		// check storage is available first as that is probably cheaper option
-		File imagedir = new File( Joiner.on(File.separator).join(holdingArea,imageIdentifier));
+		File imagedir = new File(Joiner.on(File.separator).join(holdingArea, imageIdentifier));
 		// create dir if not exists
-		if ( ! (imagedir.exists() || imagedir.mkdirs()) ) {
-			throw new StorageException("Path cannot be created: "+imagedir.getPath());
-		} else if ( ! (imagedir.isDirectory() && imagedir.canWrite() )) {
-			throw new StorageException("Path is not writable: "+imagedir.getPath());
+		if (!(imagedir.exists() || imagedir.mkdirs())) {
+			throw new StorageException("Path cannot be created: " + imagedir.getPath());
+		} else if (!(imagedir.isDirectory() && imagedir.canWrite())) {
+			throw new StorageException("Path is not writable: " + imagedir.getPath());
 		}
-		return imagedir;		
+		return imagedir;
 	}
 
 }

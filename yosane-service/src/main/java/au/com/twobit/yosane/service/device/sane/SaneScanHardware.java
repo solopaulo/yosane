@@ -32,43 +32,43 @@ import com.google.inject.name.Named;
 
 public class SaneScanHardware implements ScanHardware {
 	final Logger log = LoggerFactory.getLogger(getClass());
-	final public static int 		DEFAULT_SANE_PORT 			= 	6566;
-	final private String 			CACHE_KEY_DEVICES			=	"cache_devices";
-	final private String			CACHE_KEY_DEVICE_OPTIONS	=	"cache_options";
+	final public static int DEFAULT_SANE_PORT = 6566;
+	final private String CACHE_KEY_DEVICES = "cache_devices";
+	final private String CACHE_KEY_DEVICE_OPTIONS = "cache_options";
 	final private int sanePort;
 	final private InetAddress saneAddress;
-	private Cache<String,Object> cache;
-	
+	private Cache<String, Object> cache;
+
 	@Inject
-	public SaneScanHardware(@Named("saneHost") String saneHost,
-							@Named("sanePort") int sanePort) throws UnknownHostException {
+	public SaneScanHardware(@Named("saneHost") String saneHost, @Named("sanePort") int sanePort) throws UnknownHostException {
 		saneAddress = InetAddress.getByName(saneHost);
 		this.sanePort = sanePort;
 		initializeCache();
 	}
-	
+
 	private void initializeCache() {
-		cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.MINUTES).build();		
+		cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.MINUTES).build();
 	}
-	
-	
-	/** Gets a list of available scan devices
-	 * @throws ExecutionException 
+
+	/**
+	 * Gets a list of available scan devices
+	 * 
+	 * @throws ExecutionException
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Device> getListOfScanDevices() {
 		List<Device> deviceList = null;
-		try { 
-			deviceList = (List<Device>)cache.get(CACHE_KEY_DEVICES, new Callable<Object>() {
+		try {
+			deviceList = (List<Device>) cache.get(CACHE_KEY_DEVICES, new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					List<Device>devices = Lists.newArrayList();
+					List<Device> devices = Lists.newArrayList();
 					SaneSession session = null;
 					try {
 						session = createSaneSession();
-						devices.addAll( Collections2.transform( session.listDevices(), new TransformSaneDeviceToDevice() ) );
+						devices.addAll(Collections2.transform(session.listDevices(), new TransformSaneDeviceToDevice()));
 					} catch (Exception x) {
 						x.printStackTrace();
 						// log error
@@ -84,11 +84,13 @@ public class SaneScanHardware implements ScanHardware {
 		}
 		return deviceList;
 	}
-	
-	
-	/** Gets the details of a sane scan device
+
+	/**
+	 * Gets the details of a sane scan device
 	 * 
-	 * @param scanDeviceIdentifier The name of the scanner as provided in the list of scan devices
+	 * @param scanDeviceIdentifier
+	 *            The name of the scanner as provided in the list of scan
+	 *            devices
 	 * @return {@link Device} The scan device
 	 */
 	@Override
@@ -97,7 +99,7 @@ public class SaneScanHardware implements ScanHardware {
 			return Collections2.filter(getListOfScanDevices(), new Predicate<Device>() {
 				@Override
 				public boolean apply(Device device) {
-					return device.getName().equals(scanDeviceIdentifier);					
+					return device.getName().equals(scanDeviceIdentifier);
 				}
 			}).iterator().next();
 		} catch (Exception x) {
@@ -106,28 +108,29 @@ public class SaneScanHardware implements ScanHardware {
 	}
 
 	@Override
-	public BufferedImage acquireImage(String scanDeviceIdentifier, String ticket, DeviceOption ... options) throws AcquisitionException {
+	public BufferedImage acquireImage(String scanDeviceIdentifier, String ticket, DeviceOption... options) throws AcquisitionException {
 		// check if scanner is available
-		if ( ! scannerIsAvailable(scanDeviceIdentifier) ) {
-			throw new AcquisitionException(String.format("Device is busy: %s",scanDeviceIdentifier));
+		if (!scannerIsAvailable(scanDeviceIdentifier)) {
+			throw new AcquisitionException(String.format("Device is busy: %s", scanDeviceIdentifier));
 		}
 		return acquireImageFromScanner(scanDeviceIdentifier, options);
 	}
 
-	
-	
-	/** Gets a list of compatible options the scanner allows users to set (CACHE)
+	/**
+	 * Gets a list of compatible options the scanner allows users to set (CACHE)
 	 * 
-	 * @param scanDeviceIdentifier The scanner device identifier to identify the appropriate device
+	 * @param scanDeviceIdentifier
+	 *            The scanner device identifier to identify the appropriate
+	 *            device
 	 * @return Returns a list of device options for the identified scanner
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<DeviceOption> getScanDeviceOptions(final String scanDeviceIdentifier) {
-		String key = Joiner.on("_").join(CACHE_KEY_DEVICE_OPTIONS,scanDeviceIdentifier);
-		List<DeviceOption> options =  null;
+		String key = Joiner.on("_").join(CACHE_KEY_DEVICE_OPTIONS, scanDeviceIdentifier);
+		List<DeviceOption> options = null;
 		try {
-			options = (List<DeviceOption>) cache.get(key,  new Callable<Object>() {
+			options = (List<DeviceOption>) cache.get(key, new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
 					return getScanDeviceOptions(scanDeviceIdentifier);
@@ -138,15 +141,15 @@ public class SaneScanHardware implements ScanHardware {
 		}
 		return options;
 	}
-	
-	
-	/** Gets the options for a device from Sane
+
+	/**
+	 * Gets the options for a device from Sane
 	 * 
 	 * @param scanDeviceIdentifier
 	 * @return
 	 */
 	List<DeviceOption> getScanDeviceOptionsFromSane(final String scanDeviceIdentifier) {
-		List<DeviceOption>options = Lists.newArrayList();
+		List<DeviceOption> options = Lists.newArrayList();
 		SaneSession session = null;
 		SaneDevice device = null;
 		try {
@@ -154,20 +157,20 @@ public class SaneScanHardware implements ScanHardware {
 			session = createSaneSession();
 			device = session.getDevice(scanDeviceIdentifier);
 			device.open();
-			options.addAll( Collections2.transform(device.listOptions(), new TransformSaneOptionToDeviceOption()) );
+			options.addAll(Collections2.transform(device.listOptions(), new TransformSaneOptionToDeviceOption()));
 		} catch (Exception x) {
 			x.printStackTrace();
 			// warning
 		} finally {
 			try {
 				device.close();
-			} catch (Exception x) {}
+			} catch (Exception x) {
+			}
 			closeSaneSession(session);
 		}
-		return options;	
+		return options;
 	}
-	
-	
+
 	/* verify if the scanner is really available and not in use */
 	private boolean scannerIsAvailable(String scanDeviceIdentifier) {
 		boolean available = false;
@@ -175,7 +178,7 @@ public class SaneScanHardware implements ScanHardware {
 		try {
 			session = createSaneSession();
 			SaneDevice device = session.getDevice(scanDeviceIdentifier);
-			available = ! device.isOpen();
+			available = !device.isOpen();
 		} catch (Exception x) {
 			// error
 		} finally {
@@ -185,7 +188,7 @@ public class SaneScanHardware implements ScanHardware {
 	}
 
 	/* acquire an image and write it to disk */
-	private BufferedImage acquireImageFromScanner(String scanDeviceIdentifier,DeviceOption [] options) throws AcquisitionException {
+	private BufferedImage acquireImageFromScanner(String scanDeviceIdentifier, DeviceOption[] options) throws AcquisitionException {
 		SaneSession session = null;
 		BufferedImage image = null;
 		try {
@@ -194,30 +197,29 @@ public class SaneScanHardware implements ScanHardware {
 			// create a new sane session
 			session = createSaneSession();
 			// set password provider
-			session.setPasswordProvider( SanePasswordProvider.usingDotSanePassFile() );
+			session.setPasswordProvider(SanePasswordProvider.usingDotSanePassFile());
 			// get the device handle for the resource
 			SaneDevice device = session.getDevice(name);
 			// open the device
-			device.open();		
-			if ( options != null && options.length > 0 ) {
+			device.open();
+			if (options != null && options.length > 0) {
 				// get the option list and set options as appropriate
 				for (DeviceOption option : options) {
-					device.getOption( option.getTitle()).setStringValue( option.getValue() );
+					device.getOption(option.getTitle()).setStringValue(option.getValue());
 				}
 			}
 			// acquire the image
 			image = device.acquireImage();
 		} catch (Exception x) {
 			// error
-			log.error("Unable to open device with identifier: {}",scanDeviceIdentifier);
-			throw new AcquisitionException(String.format("Scan failed: %s", x.getMessage()),x);
+			log.error("Unable to open device with identifier: {}", scanDeviceIdentifier);
+			throw new AcquisitionException(String.format("Scan failed: %s", x.getMessage()), x);
 		} finally {
 			closeSaneSession(session);
-		}	
+		}
 		return image;
 	}
 
-	
 	/* Create a new sane session */
 	private SaneSession createSaneSession() throws Exception {
 		SaneSession session = null;
@@ -229,12 +231,12 @@ public class SaneScanHardware implements ScanHardware {
 		}
 		return session;
 	}
-	
-	
+
 	/* Clean up the sane session */
 	private void closeSaneSession(SaneSession session) {
 		try {
 			session.close();
-		} catch (Exception x) { }
-	}	
+		} catch (Exception x) {
+		}
+	}
 }

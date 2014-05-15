@@ -10,7 +10,7 @@ public class UUIDTicketGenerator implements TicketGenerator {
 
 	@Override
 	public String newTicket() {
-		return Hashing.md5().hashString( UUID.randomUUID().toString() , Charset.defaultCharset()).toString();
+		return Hashing.md5().hashString(UUID.randomUUID().toString(), Charset.defaultCharset()).toString();
 	}
 
 }

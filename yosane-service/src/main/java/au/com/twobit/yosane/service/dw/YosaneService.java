@@ -27,36 +27,35 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
 
 	@Override
 	public void initialize(Bootstrap<YosaneServiceConfiguration> configuration) {
-		// TODO Auto-generated method stub		
+		// TODO Auto-generated method stub
 	}
-
 
 	@Override
 	public void run(YosaneServiceConfiguration configuration, Environment env) throws Exception {
-		// initialise Guice with our custom thingies that we like to inject places
-		Injector injector = Guice.createInjector( new YosaneGuiceModule() );
+		// initialise Guice with our custom thingies that we like to inject
+		// places
+		Injector injector = Guice.createInjector(new YosaneGuiceModule());
 		// add resource for scanner
-		env.jersey().register( injector.getInstance(ScannersResource.class) );
+		env.jersey().register(injector.getInstance(ScannersResource.class));
 		// add resource for image
-		env.jersey().register( injector.getInstance(ImagesResource.class) );
+		env.jersey().register(injector.getInstance(ImagesResource.class));
 		// add resource for document
 
 		// add health check
 		env.healthChecks().register("Scanner Availability", injector.getInstance(ScannersAvailable.class));
-		
+
 		// add managed class to shutdown executor service
-		env.lifecycle().manage( injector.getInstance(Key.get(Managed.class, Names.named("async"))));
-	}
-	
-	public static void main(String [] args) {
-		try {
-			File banner = new File( new URI( YosaneService.class.getResource("/banner.txt").toString()));
-			System.out.println( Files.toString(banner, Charset.defaultCharset()));
-			new YosaneService().run(args);
-		} catch (Exception x) {
-			System.err.println(String.format("Abnormal exit: %s",x.getMessage()));
-		}
+		env.lifecycle().manage(injector.getInstance(Key.get(Managed.class, Names.named("async"))));
 	}
 
+	public static void main(String[] args) {
+		try {
+			File banner = new File(new URI(YosaneService.class.getResource("/banner.txt").toString()));
+			System.out.println(Files.toString(banner, Charset.defaultCharset()));
+			new YosaneService().run(args);
+		} catch (Exception x) {
+			System.err.println(String.format("Abnormal exit: %s", x.getMessage()));
+		}
+	}
 
 }

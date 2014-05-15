@@ -24,40 +24,38 @@ import com.google.inject.Inject;
 public class ImagesResource {
 
 	private Storage storage;
-	
+
 	@Inject
 	public ImagesResource(Storage storage) {
 		this.storage = storage;
 	}
-	
+
 	@GET
 	@Path("/{imageId}")
 	public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
 		ImageStatus status = storage.getStatus(imageIdentifier);
 		return Response.ok(status.name()).build();
 	}
-	
+
 	@GET
 	@Path("/{imageId}/download")
 	@Produces("image/png")
-	@CacheControl(maxAge=1,maxAgeUnit=TimeUnit.MINUTES)
+	@CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
 	public Response getImageFile(@PathParam("imageId") String imageId, @QueryParam("size") String size) {
-		try { 
-			return Response
-					.ok()
-					.entity( createByteArrayFromImage(storage.loadImage(imageId), png.name()) )
-					.build();
-		} catch (Exception x) { x.printStackTrace(); }
-		return Response.ok().build();            
+		try {
+			return Response.ok().entity(createByteArrayFromImage(storage.loadImage(imageId), png.name())).build();
+		} catch (Exception x) {
+			x.printStackTrace();
+		}
+		return Response.ok().build();
 	}
 
-	
 	@POST
 	@Path("/{imageId}/rotate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response rotateImageFile(@QueryParam("direction") String rotation) {
-		
+
 		return Response.serverError().build();
 	}
-	
+
 }

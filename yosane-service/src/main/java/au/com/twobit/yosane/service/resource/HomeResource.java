@@ -12,7 +12,7 @@ public class HomeResource {
 	public HomeResource() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response home() {

@@ -1,7 +1,5 @@
 package au.com.twobit.yosane.service.device.sane;
 
-
-
 import org.junit.Assert;
 import org.junit.Test;
 
