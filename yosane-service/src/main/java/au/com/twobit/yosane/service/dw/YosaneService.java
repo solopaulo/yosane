@@ -22,9 +22,13 @@ import com.google.inject.name.Names;
 
 public class YosaneService extends Application<YosaneServiceConfiguration> {
 
+    // initialise Guice with our custom thingies that we like to inject
+    final private Injector injector;
+    
     public YosaneService() {
+        injector = Guice.createInjector(new YosaneGuiceModule());
     }
-
+        
     @Override
     public void initialize(Bootstrap<YosaneServiceConfiguration> configuration) {
         // TODO Auto-generated method stub
@@ -32,9 +36,6 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
 
     @Override
     public void run(YosaneServiceConfiguration configuration, Environment env) throws Exception {
-        // initialise Guice with our custom thingies that we like to inject
-        // places
-        Injector injector = Guice.createInjector(new YosaneGuiceModule());
         // add resource for scanner
         env.jersey().register(injector.getInstance(ScannersResource.class));
         // add resource for image

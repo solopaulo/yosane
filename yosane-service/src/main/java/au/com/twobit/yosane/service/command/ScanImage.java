@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 
 import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.service.device.ScanHardware;
+import au.com.twobit.yosane.service.dw.YosaneService;
 import au.com.twobit.yosane.service.storage.Storage;
 
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -35,7 +36,7 @@ public class ScanImage implements Runnable {
             // store the image
             storage.saveImage(bi, imageIdentifier);
             // create thumbnail
-            BufferedImage thumbnail = new CreateThumbnail(storage, imageIdentifier).call();
+            BufferedImage thumbnail = new CreateThumbnail(bi).call();
             // save thumbnail
             storage.saveImageThumbnail(thumbnail, imageIdentifier);
             // update the status and write to file
@@ -45,6 +46,7 @@ public class ScanImage implements Runnable {
             try {
                 storage.updateStatus(ImageStatus.FAILED, imageIdentifier);
             } catch (Exception x1) {
+                x.printStackTrace();
             }
             // log errors and stuff
         }

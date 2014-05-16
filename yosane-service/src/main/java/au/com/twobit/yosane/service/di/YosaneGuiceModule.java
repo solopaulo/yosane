@@ -5,6 +5,7 @@ import io.dropwizard.lifecycle.Managed;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import au.com.twobit.yosane.service.command.CreateThumbnail;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.storage.FileStorage;
 import au.com.twobit.yosane.service.storage.Storage;
@@ -29,10 +30,7 @@ public class YosaneGuiceModule extends AbstractModule {
         final ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
         bind(ExecutorService.class).toInstance(executorService);
         bind(Managed.class).annotatedWith(Names.named("async")).toInstance(new Managed() {
-            @Override
-            public void start() throws Exception {
-            }
-
+            @Override public void start() throws Exception { }
             @Override
             public void stop() throws Exception {
                 executorService.shutdown();
@@ -41,11 +39,17 @@ public class YosaneGuiceModule extends AbstractModule {
 
         // configure the sane dependencies
         install(new SaneDependencyModule());
-        // set up some constants
+        
+        // set up temporary holding area location
         bind(String.class).annotatedWith(Names.named("holdingArea")).toInstance("/tmp/yosane/");
+        // set up output image format
         bind(String.class).annotatedWith(Names.named("imageOutputFormat")).toInstance(ImageFormat.png.name());
         // register the file storage class for image persistence
         bind(Storage.class).to(FileStorage.class);
+        
+        // set the default thumbnail scale length (width)
+        requestStaticInjection(CreateThumbnail.class);
+        bind(Integer.class).annotatedWith(Names.named("scaleWidth")).toInstance(320);
     }
 
 }

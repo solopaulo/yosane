@@ -4,6 +4,8 @@ import static au.com.twobit.yosane.service.image.ImageFormat.png;
 import static au.com.twobit.yosane.service.image.ImageUtils.createByteArrayFromImage;
 import io.dropwizard.jersey.caching.CacheControl;
 
+import java.awt.image.BufferedImage;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
@@ -16,18 +18,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import au.com.twobit.yosane.api.ImageStatus;
+import au.com.twobit.yosane.service.command.ImageRotation;
+import au.com.twobit.yosane.service.image.RotateDirection;
 import au.com.twobit.yosane.service.storage.Storage;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
 @Path("/images")
 public class ImagesResource {
 
     private Storage storage;
+    private ExecutorService executorService;
 
     @Inject
-    public ImagesResource(Storage storage) {
+    public ImagesResource(Storage storage, ExecutorService executorService) {
         this.storage = storage;
+        this.executorService = executorService;
     }
 
     @GET
@@ -38,23 +45,50 @@ public class ImagesResource {
     }
 
     @GET
-    @Path("/{imageId}/download")
+    @Path("/{imageId}/file")
     @Produces("image/png")
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    public Response getImageFile(@PathParam("imageId") String imageId, @QueryParam("size") String size) {
+    public Response getImageFile(@PathParam("imageId") String imageIdentifier) {
         try {
-            return Response.ok().entity(createByteArrayFromImage(storage.loadImage(imageId), png.name())).build();
+            storage.assertStatus(imageIdentifier, ImageStatus.READY);
+            BufferedImage image = storage.loadImage(imageIdentifier);
+            return Response.ok().entity(createByteArrayFromImage(image, png.name())).build();
         } catch (Exception x) {
-            x.printStackTrace();
+            return Response.serverError().build();
         }
-        return Response.ok().build();
+    }
+    
+    
+    @GET
+    @Path("/{imageId}/file/thumb")
+    @Produces("image/png")
+    public Response getImageThumb(@PathParam("imageId") String imageIdentifier) {
+        try {
+            storage.assertStatus(imageIdentifier, ImageStatus.READY);
+            BufferedImage image = storage.loadImageThumbnail(imageIdentifier);
+            return Response.ok().entity(createByteArrayFromImage(image, png.name())).build();
+        } catch (Exception x) {
+            return Response.serverError().build();
+        }
     }
 
     @POST
     @Path("/{imageId}/rotate")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response rotateImageFile(@QueryParam("direction") String rotation) {
-
+    public Response rotateImageFile(@PathParam("imageId") String imageIdentifier, @QueryParam("direction") String rotation) {
+        RotateDirection direction = RotateDirection.UNKNOWN;
+        try {
+            storage.assertStatus(imageIdentifier, ImageStatus.READY);
+            direction = RotateDirection.valueOf(rotation.toUpperCase());
+            if ( direction == RotateDirection.UNKNOWN ) {
+                throw new Exception();
+            }
+            executorService.execute( new ImageRotation(storage, imageIdentifier,direction) );
+            return Response.ok().build();
+        } catch (Exception x) { 
+            x.printStackTrace();
+            
+        }
         return Response.serverError().build();
     }
 

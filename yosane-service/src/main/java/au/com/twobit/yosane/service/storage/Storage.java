@@ -82,4 +82,12 @@ public interface Storage {
      */
     public ImageStatus getStatus(String imageIdentifier) throws StorageException;
 
+    /** Verifies the status is as requested
+     * 
+     * @param imageIdentifier the unique identifier for the image
+     * @param status the status we want to assert is correct
+     * @throws StorageException - must throw a storage exception if the assertion fails
+     */
+    public void assertStatus(String imageIdentifier, ImageStatus status) throws StorageException;
+    
 }

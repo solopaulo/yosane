@@ -37,7 +37,7 @@ public class FileStorage implements Storage {
         save(image, imageIdentifier, THUMB_FILE_NAME);
     }
 
-    void save(BufferedImage image, String imageIdentifier, String filename) throws StorageException {
+    protected void save(BufferedImage image, String imageIdentifier, String filename) throws StorageException {
         File imagedir = getImageAreaDirectory(imageIdentifier);
         // determine the path of the file
         String imageFilePath = Joiner.on(File.separator).join(imagedir.getPath(), filename);
@@ -61,7 +61,7 @@ public class FileStorage implements Storage {
         return load(imageIdentifier, THUMB_FILE_NAME);
     }
 
-    BufferedImage load(String imageIdentifier, String filename) throws StorageException {
+    protected BufferedImage load(String imageIdentifier, String filename) throws StorageException {
         File imagedir = getImageAreaDirectory(imageIdentifier);
         String filepath = Joiner.on(File.separator).join(imagedir.getPath(), filename);
         File file = new File(filepath);
@@ -95,7 +95,17 @@ public class FileStorage implements Storage {
         return ImageStatus.FAILED;
     }
 
-    File getImageAreaDirectory(String imageIdentifier) throws StorageException {
+    @Override
+    public void assertStatus(String imageIdentifier, ImageStatus status) throws StorageException {
+        ImageStatus currentStatus = getStatus(imageIdentifier) ; 
+        if ( status != currentStatus ) {
+            throw new StorageException(String.format("Asserted status %s but instead it was %s",status.name(),currentStatus.name()));
+        }
+        
+    }
+
+
+    protected File getImageAreaDirectory(String imageIdentifier) throws StorageException {
         // check storage is available first as that is probably cheaper option
         File imagedir = new File(Joiner.on(File.separator).join(holdingArea, imageIdentifier));
         // create dir if not exists

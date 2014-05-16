@@ -50,9 +50,9 @@ public class ScannersResource {
     final private TicketGenerator ticketGenerator;
     /* executor service */
     final private ExecutorService executorService;
-
+    
     @Inject
-    public ScannersResource(ScanHardware hardware, Storage storage, TicketGenerator ticketGenerator, ExecutorService executorService) {
+    public ScannersResource(ScanHardware hardware, Storage storage, TicketGenerator ticketGenerator,ExecutorService executorService) {
         this.hardware = hardware;
         this.storage = storage;
         this.ticketGenerator = ticketGenerator;
@@ -116,7 +116,7 @@ public class ScannersResource {
         } catch (Exception x) {
         }
         executorService.execute(new ScanImage(hardware, storage, scannerName, image.getIdentifier()));
-
+        
         // return the response
         return Response.ok(image).location(location).build();
     }
