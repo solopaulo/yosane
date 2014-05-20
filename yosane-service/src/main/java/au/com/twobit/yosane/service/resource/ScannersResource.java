@@ -1,5 +1,6 @@
 package au.com.twobit.yosane.service.resource;
 
+import static com.theoryinpractise.halbuilder.api.RepresentationFactory.HAL_JSON;
 import io.dropwizard.jersey.caching.CacheControl;
 
 import java.net.URI;
@@ -21,17 +22,19 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.twobit.yosane.api.Device;
 import au.com.twobit.yosane.api.DeviceOption;
 import au.com.twobit.yosane.api.Image;
 import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.service.command.ScanImage;
 import au.com.twobit.yosane.service.device.ScanHardware;
 import au.com.twobit.yosane.service.storage.Storage;
+import au.com.twobit.yosane.service.utils.EncodeDecode;
 import au.com.twobit.yosane.service.utils.TicketGenerator;
 
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import com.google.inject.Inject;
-
+import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
+import com.theoryinpractise.halbuilder.api.Representation;
 /**
  * A Resource to make scanning requests to available scanners
  * 
@@ -50,13 +53,25 @@ public class ScannersResource {
     final private TicketGenerator ticketGenerator;
     /* executor service */
     final private ExecutorService executorService;
+    /* json factory for hateoas */
+    final DefaultRepresentationFactory hal;
+    /* encoder/decoder */
+    final EncodeDecode coder;
+     
     
     @Inject
-    public ScannersResource(ScanHardware hardware, Storage storage, TicketGenerator ticketGenerator,ExecutorService executorService) {
+    public ScannersResource(ScanHardware hardware,
+                            Storage storage,
+                            TicketGenerator ticketGenerator,
+                            ExecutorService executorService,
+                            DefaultRepresentationFactory hal,
+                            EncodeDecode coder) {
         this.hardware = hardware;
         this.storage = storage;
         this.ticketGenerator = ticketGenerator;
         this.executorService = executorService;
+        this.hal = hal;
+        this.coder = coder;
     }
 
     /**
@@ -69,7 +84,15 @@ public class ScannersResource {
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
     public Response getScannerList() {
         try {
-            return Response.ok(hardware.getListOfScanDevices()).build();
+            String pathbase = getClass().getAnnotation(Path.class).value();
+            Representation response = hal.newRepresentation(pathbase);
+            List<Device> scanners = hardware.getListOfScanDevices();
+            response.withProperty("scanners", scanners);
+            for (Device device : scanners) {
+                response.withLink("scanner", String.format("%s/%s",pathbase,device.getId()));
+            }
+
+            return Response.ok(response.toString( HAL_JSON)).build();
         } catch (Exception x) {
             log.error("Failed to get a list of scanner hardware devices: {}", x.getMessage());
             return Response.serverError().build();
@@ -86,7 +109,13 @@ public class ScannersResource {
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
     public Response getScanner(@PathParam("scannerId") String scannerId) {
         try {
-            return Response.ok(hardware.getScanDeviceDetails(Base64Coder.decodeString(scannerId))).build();
+            String pathbase = getClass().getAnnotation(Path.class).value();
+            Device scanner = hardware.getScanDeviceDetails(coder.decodeString(scannerId));
+            Representation response = 
+                    hal.newRepresentation(String.format("%s/%s",pathbase,scannerId))
+                        .withBean(scanner)
+                        .withLink("scanners",pathbase);                    
+            return Response.ok( response.toString(HAL_JSON )).build();
         } catch (Exception x) {
             // log an error
             x.printStackTrace();
@@ -111,7 +140,7 @@ public class ScannersResource {
         // dispatch a scanning request
         String scannerName = null;
         try {
-            scannerName = Base64Coder.decodeString(scannerId);
+            scannerName = coder.decodeString(scannerId);
             location = UriBuilder.fromPath("/images/" + image.getIdentifier() + "/download").build(image.getIdentifier());
         } catch (Exception x) {
         }
@@ -132,7 +161,7 @@ public class ScannersResource {
     public Response getScannerOptions(@PathParam("scannerId") String scannerId) {
         String error = "";
         try {
-            List<DeviceOption> options = hardware.getScanDeviceOptions(Base64Coder.decodeString(scannerId));
+            List<DeviceOption> options = hardware.getScanDeviceOptions(coder.decodeString(scannerId));
             return Response.ok(options).build();
         } catch (IllegalArgumentException x) {
             error = UNKNOWN_SCANNER_IDENTIFIER;
@@ -147,22 +176,10 @@ public class ScannersResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response setScannerOptions(@PathParam("scannerId") String scannerId) {
-        String error = "";
         try {
-
+            hardware.getScanDeviceOptions(scannerId);
         } catch (IllegalArgumentException x) {
-            error = UNKNOWN_SCANNER_IDENTIFIER;
         }
         return Response.serverError().build();
-    }
-
-    static enum Relations {
-        SCANNER("Scanning device"), SCANNERS("List of Scanning devices");
-
-        final private String description;
-
-        private Relations(String description) {
-            this.description = description;
-        }
     }
 }

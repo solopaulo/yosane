@@ -3,7 +3,6 @@ package au.com.twobit.yosane.service.utils;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import com.google.common.hash.Hashing;
 
 public class UUIDTicketGenerator implements TicketGenerator {

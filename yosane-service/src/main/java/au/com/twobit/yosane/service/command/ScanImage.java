@@ -1,14 +1,10 @@
 package au.com.twobit.yosane.service.command;
 
 import java.awt.image.BufferedImage;
-import java.util.concurrent.ExecutorService;
 
 import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.service.device.ScanHardware;
-import au.com.twobit.yosane.service.dw.YosaneService;
 import au.com.twobit.yosane.service.storage.Storage;
-
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 public class ScanImage implements Runnable {
 

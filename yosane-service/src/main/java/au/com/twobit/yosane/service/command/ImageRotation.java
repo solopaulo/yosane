@@ -3,7 +3,6 @@ package au.com.twobit.yosane.service.command;
 import java.awt.image.BufferedImage;
 
 import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
 import au.com.twobit.yosane.api.ImageStatus;

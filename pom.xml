@@ -17,9 +17,22 @@
   			<artifactId>dropwizard-core</artifactId>
   			<version>${dropwizard.version}</version>
   		</dependency>
+  		<dependency>
+  			<groupId>org.mockito</groupId>
+  			<artifactId>mockito-all</artifactId>
+  			<version>${mockito.version}</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>${junit.version}</version>
+  			<scope>test</scope>
+  		</dependency>
   	</dependencies>
   </dependencyManagement>
   <properties>
   	<dropwizard.version>0.7.0</dropwizard.version>
+  	<mockito.version>1.9.5</mockito.version>
+  	<junit.version>4.11</junit.version>
   </properties>
 </project>

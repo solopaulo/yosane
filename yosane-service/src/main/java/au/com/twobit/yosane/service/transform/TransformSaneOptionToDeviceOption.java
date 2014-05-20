@@ -1,19 +1,18 @@
 package au.com.twobit.yosane.service.transform;
 
-import java.util.List;
-
 import au.com.southsky.jfreesane.OptionValueType;
 import au.com.southsky.jfreesane.SaneOption;
 import au.com.twobit.yosane.api.DeviceOption;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 public class TransformSaneOptionToDeviceOption implements Function<SaneOption, DeviceOption> {
 
     @Override
     public DeviceOption apply(SaneOption option) {
+        if ( option == null ) {
+            return null;
+        }
         DeviceOption dopt = new DeviceOption();
         dopt.setName(option.getName());
         dopt.setDescription(option.getDescription());

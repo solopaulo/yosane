@@ -17,31 +17,51 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import au.com.twobit.yosane.api.Image;
 import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.service.command.ImageRotation;
+import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.image.RotateDirection;
 import au.com.twobit.yosane.service.storage.Storage;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
+import com.theoryinpractise.halbuilder.api.Representation;
+import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 
 @Path("/images")
 public class ImagesResource {
 
     private Storage storage;
     private ExecutorService executorService;
-
+    private DefaultRepresentationFactory hal;
+    
     @Inject
-    public ImagesResource(Storage storage, ExecutorService executorService) {
+    public ImagesResource(Storage storage, ExecutorService executorService, DefaultRepresentationFactory hal) {
         this.storage = storage;
         this.executorService = executorService;
+        this.hal = hal;
     }
 
     @GET
     @Path("/{imageId}")
     public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
         ImageStatus status = storage.getStatus(imageIdentifier);
-        return Response.ok(status.name()).build();
+        Image image = new Image();
+        image.setIdentifier(imageIdentifier);
+        image.setOutputFormat( ImageFormat.png.name() );
+        image.setStatus(status);
+        
+        String pathbase = String.format("%s/%s",getClass().getAnnotation(Path.class).value(),imageIdentifier);
+        
+        Representation response = 
+                hal.newRepresentation(pathbase)
+                   .withLink("scan", "/scanners")
+                   .withLink("image-rotate", String.format("%s/rotate",pathbase))
+                   .withLink("image-download", String.format("%s/file",pathbase))
+                   .withLink("image-download-thumb", String.format("%s/file/thumb",pathbase))
+                   .withBean(image);
+        return Response.ok(response.toString( RepresentationFactory.HAL_JSON)).build();
     }
 
     @GET
@@ -76,8 +96,8 @@ public class ImagesResource {
     @Path("/{imageId}/rotate")
     @Produces(MediaType.APPLICATION_JSON)
     public Response rotateImageFile(@PathParam("imageId") String imageIdentifier, @QueryParam("direction") String rotation) {
-        RotateDirection direction = RotateDirection.UNKNOWN;
         try {
+            RotateDirection direction = RotateDirection.UNKNOWN;
             storage.assertStatus(imageIdentifier, ImageStatus.READY);
             direction = RotateDirection.valueOf(rotation.toUpperCase());
             if ( direction == RotateDirection.UNKNOWN ) {
