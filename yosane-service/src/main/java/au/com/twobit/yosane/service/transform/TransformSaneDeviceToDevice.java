@@ -1,20 +1,18 @@
 package au.com.twobit.yosane.service.transform;
 
-import org.junit.Before;
-
 import au.com.southsky.jfreesane.SaneDevice;
 import au.com.twobit.yosane.api.Device;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
-import au.com.twobit.yosane.service.utils.URLEncodeDecode;
 
 import com.google.common.base.Function;
+import com.google.inject.Inject;
 
 public class TransformSaneDeviceToDevice implements Function<SaneDevice, Device> {
     private EncodeDecode coder;
     
-    @Before
-    public void onSetup() {
-        coder = new URLEncodeDecode();
+    @Inject
+    public void setCoder(EncodeDecode coder) {
+        this.coder = coder;
     }
     
     @Override

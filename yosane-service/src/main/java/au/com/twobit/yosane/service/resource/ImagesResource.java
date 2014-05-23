@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,9 +20,9 @@ import javax.ws.rs.core.Response;
 
 import au.com.twobit.yosane.api.Image;
 import au.com.twobit.yosane.api.ImageStatus;
-import au.com.twobit.yosane.service.command.ImageRotation;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.image.RotateDirection;
+import au.com.twobit.yosane.service.op.command.ImageRotation;
 import au.com.twobit.yosane.service.storage.Storage;
 
 import com.google.inject.Inject;
@@ -31,7 +32,8 @@ import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 
 @Path("/images")
 public class ImagesResource {
-
+    public static final String METHOD_GET_IMAGE_FILE = "GET IMAGE FILE";
+    
     private Storage storage;
     private ExecutorService executorService;
     private DefaultRepresentationFactory hal;
@@ -43,6 +45,9 @@ public class ImagesResource {
         this.hal = hal;
     }
 
+    /* (non-Javadoc)
+     * @see au.com.twobit.yosane.service.resource.impl.ImagesResource#getImageDetails(java.lang.String)
+     */
     @GET
     @Path("/{imageId}")
     public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
@@ -64,10 +69,14 @@ public class ImagesResource {
         return Response.ok(response.toString( RepresentationFactory.HAL_JSON)).build();
     }
 
+    /* (non-Javadoc)
+     * @see au.com.twobit.yosane.service.resource.impl.ImagesResource#getImageFile(java.lang.String)
+     */
     @GET
     @Path("/{imageId}/file")
     @Produces("image/png")
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
+    @Named(METHOD_GET_IMAGE_FILE)
     public Response getImageFile(@PathParam("imageId") String imageIdentifier) {
         try {
             storage.assertStatus(imageIdentifier, ImageStatus.READY);
@@ -79,6 +88,9 @@ public class ImagesResource {
     }
     
     
+    /* (non-Javadoc)
+     * @see au.com.twobit.yosane.service.resource.impl.ImagesResource#getImageThumb(java.lang.String)
+     */
     @GET
     @Path("/{imageId}/file/thumb")
     @Produces("image/png")
@@ -92,6 +104,9 @@ public class ImagesResource {
         }
     }
 
+    /* (non-Javadoc)
+     * @see au.com.twobit.yosane.service.resource.impl.ImagesResource#rotateImageFile(java.lang.String, java.lang.String)
+     */
     @POST
     @Path("/{imageId}/rotate")
     @Produces(MediaType.APPLICATION_JSON)

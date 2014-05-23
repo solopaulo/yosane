@@ -2,12 +2,14 @@ package au.com.twobit.yosane.api;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 public class DeviceOption {
-	private String name;
+	@NotNull private String name;
 	private String description;
 	private String title;
 	private String type;
-	private String value;
+	@NotNull private String value;
 	private List<String>values;
 
 	public String getValue() {

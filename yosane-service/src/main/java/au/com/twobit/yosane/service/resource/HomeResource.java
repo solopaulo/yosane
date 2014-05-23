@@ -1,22 +1,40 @@
 package au.com.twobit.yosane.service.resource;
 
+import java.net.URI;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
+import com.google.inject.Inject;
+import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
+import com.theoryinpractise.halbuilder.api.Representation;
 
 @Path("/")
 public class HomeResource {
-
-    public HomeResource() {
-        // TODO Auto-generated constructor stub
+    final static URI HOME = UriBuilder.fromResource(HomeResource.class).build();
+    
+    private DefaultRepresentationFactory hal;
+    
+    @Inject
+    public HomeResource(DefaultRepresentationFactory hal) {
+        this.hal = hal;
     }
 
+    /* (non-Javadoc)
+     * @see au.com.twobit.yosane.service.resource.impl.HomeResource#apiHome()
+     */
     @GET
-    @Produces(MediaType.TEXT_HTML)
-    public Response home() {
-        return Response.ok("Yay").build();
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response apiHome() {
+        Representation response = hal.newRepresentation("/")
+                .withLink("scanners", ScannersResource.class.getAnnotation(Path.class).value())
+                .withLink("images",ImagesResource.class.getAnnotation(Path.class).value())
+                .withLink("documents", DocumentsResource.class.getAnnotation(Path.class).value());
+        return Response.ok( response.toString( DefaultRepresentationFactory.HAL_JSON ) ).build();
     }
-
 }

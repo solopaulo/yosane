@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import au.com.twobit.yosane.service.image.ImageFormat;
+import au.com.twobit.yosane.service.op.command.CreateThumbnail;
 
 public class CreateThumbnailTest {
 

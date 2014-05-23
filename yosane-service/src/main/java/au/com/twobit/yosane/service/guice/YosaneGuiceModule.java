@@ -1,12 +1,12 @@
-package au.com.twobit.yosane.service.di;
+package au.com.twobit.yosane.service.guice;
 
 import io.dropwizard.lifecycle.Managed;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import au.com.twobit.yosane.service.command.CreateThumbnail;
 import au.com.twobit.yosane.service.image.ImageFormat;
+import au.com.twobit.yosane.service.op.command.CreateThumbnail;
 import au.com.twobit.yosane.service.storage.FileStorage;
 import au.com.twobit.yosane.service.storage.Storage;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
@@ -29,9 +29,10 @@ public class YosaneGuiceModule extends AbstractModule {
         configureHalBuilder();
         configureMiscellany();     
         configureExecutorService();
-        // configure the sane dependencies
-        install(new MockSaneDependencyModule());
         configureYosaneSettings();
+        MockSaneDependencyModule m = new MockSaneDependencyModule();
+        requestInjection(m);
+        install( m );
     }
 
     private void configureYosaneSettings() {

@@ -9,8 +9,9 @@ import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-import au.com.twobit.yosane.service.di.YosaneGuiceModule;
 import au.com.twobit.yosane.service.dw.healthcheck.ScannersAvailable;
+import au.com.twobit.yosane.service.guice.YosaneGuiceModule;
+import au.com.twobit.yosane.service.resource.HomeResource;
 import au.com.twobit.yosane.service.resource.ImagesResource;
 import au.com.twobit.yosane.service.resource.ScannersResource;
 
@@ -36,12 +37,14 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
 
     @Override
     public void run(YosaneServiceConfiguration configuration, Environment env) throws Exception {
+        // add resource for home
+        env.jersey().register(injector.getInstance(HomeResource.class));
         // add resource for scanner
         env.jersey().register(injector.getInstance(ScannersResource.class));
         // add resource for image
         env.jersey().register(injector.getInstance(ImagesResource.class));
         // add resource for document
-
+        
         // add health check
         env.healthChecks().register("Scanner Availability", injector.getInstance(ScannersAvailable.class));
 

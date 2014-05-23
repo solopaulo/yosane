@@ -1,4 +1,4 @@
-package au.com.twobit.yosane.service.command;
+package au.com.twobit.yosane.service.op.command;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.Callable;

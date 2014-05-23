@@ -1,5 +1,8 @@
 package au.com.twobit.yosane.service.resource;
 
+import static au.com.twobit.yosane.service.resource.ImagesResource.METHOD_GET_IMAGE_FILE;
+import static au.com.twobit.yosane.service.resource.ResourcePathBuilder.createPath;
+import static au.com.twobit.yosane.service.resource.ResourcePathBuilder.createRelation;
 import static com.theoryinpractise.halbuilder.api.RepresentationFactory.HAL_JSON;
 import io.dropwizard.jersey.caching.CacheControl;
 
@@ -8,16 +11,16 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.inject.Named;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +29,18 @@ import au.com.twobit.yosane.api.Device;
 import au.com.twobit.yosane.api.DeviceOption;
 import au.com.twobit.yosane.api.Image;
 import au.com.twobit.yosane.api.ImageStatus;
-import au.com.twobit.yosane.service.command.ScanImage;
 import au.com.twobit.yosane.service.device.ScanHardware;
+import au.com.twobit.yosane.service.op.command.ScanImage;
+import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.storage.Storage;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
 import au.com.twobit.yosane.service.utils.TicketGenerator;
 
 import com.google.inject.Inject;
+import com.sun.jersey.core.provider.EntityHolder;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Representation;
+
 /**
  * A Resource to make scanning requests to available scanners
  * 
@@ -42,7 +48,10 @@ import com.theoryinpractise.halbuilder.api.Representation;
  * 
  */
 @Path("/scanners")
+@Relation("scanners")
 public class ScannersResource {
+    final static String METHOD_GET_SCANNER = "GET SCANNER";
+    
     private Logger log = LoggerFactory.getLogger(getClass());
     private final String UNKNOWN_SCANNER_IDENTIFIER = "This is not a valid scanner identifier";
     /* an interface used to talk to scanner hardware */
@@ -55,9 +64,8 @@ public class ScannersResource {
     final private ExecutorService executorService;
     /* json factory for hateoas */
     final DefaultRepresentationFactory hal;
-    /* encoder/decoder */
+    /* encoder / decoder */
     final EncodeDecode coder;
-     
     
     @Inject
     public ScannersResource(ScanHardware hardware,
@@ -73,32 +81,35 @@ public class ScannersResource {
         this.hal = hal;
         this.coder = coder;
     }
-
-    /**
-     * Gets the list of scanners available from this host
+    
+    
+    
+    /** Gets a list of all available scanners
      * 
-     * @return List of scanners
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
     public Response getScannerList() {
         try {
-            String pathbase = getClass().getAnnotation(Path.class).value();
-            Representation response = hal.newRepresentation(pathbase);
-            List<Device> scanners = hardware.getListOfScanDevices();
-            response.withProperty("scanners", scanners);
-            for (Device device : scanners) {
-                response.withLink("scanner", String.format("%s/%s",pathbase,device.getId()));
+            Representation response = hal.newRepresentation( createPath(ScannersResource.class).get() );
+            for (Device device : hardware.getListOfScanDevices()) {
+                response.withLink(
+                        "scanner",
+                        createPath(ScannersResource.class,METHOD_GET_SCANNER,device.getId()).get().toString(),
+                        device.getName(),
+                        String.format("%s %s", device.getVendor(),device.getModel()),
+                        null,
+                        null);
             }
-
             return Response.ok(response.toString( HAL_JSON)).build();
         } catch (Exception x) {
             log.error("Failed to get a list of scanner hardware devices: {}", x.getMessage());
             return Response.serverError().build();
         }
     }
-
+    
+    
     /**
      * Gets the details of a single scanner
      * 
@@ -107,21 +118,25 @@ public class ScannersResource {
     @Path("/{scannerId}")
     @Produces(MediaType.APPLICATION_JSON)
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
+    @Named(METHOD_GET_SCANNER)
+    @Relation("scanner")
     public Response getScanner(@PathParam("scannerId") String scannerId) {
         try {
-            String pathbase = getClass().getAnnotation(Path.class).value();
             Device scanner = hardware.getScanDeviceDetails(coder.decodeString(scannerId));
             Representation response = 
-                    hal.newRepresentation(String.format("%s/%s",pathbase,scannerId))
+                    hal.newRepresentation(createPath(ScannersResource.class,METHOD_GET_SCANNER,scannerId).get())
                         .withBean(scanner)
-                        .withLink("scanners",pathbase);                    
+                        .withLink(createRelation(ScannersResource.class),
+                                  createPath(ScannersResource.class).get());                    
             return Response.ok( response.toString(HAL_JSON )).build();
         } catch (Exception x) {
             // log an error
             x.printStackTrace();
         }
         return Response.serverError().build();
+
     }
+     
 
     /**
      * Acquires a new image and returns meta data about it
@@ -130,25 +145,38 @@ public class ScannersResource {
     @Path("/{scannerId}")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response acquireImage(@PathParam("scannerId") String scannerId, @Context HttpServletRequest request) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response acquireImage(@PathParam("scannerId") String scannerId,
+                                 @Valid List<DeviceOption> options) {
         // create an image descriptor
         Image image = new Image();
         image.setStatus(ImageStatus.ACCEPTED);
-        image.setIdentifier(ticketGenerator.newTicket());
+        String iid = ticketGenerator.newTicket();
+        image.setIdentifier(iid);
         URI location = null;
 
         // dispatch a scanning request
         String scannerName = null;
         try {
             scannerName = coder.decodeString(scannerId);
-            location = UriBuilder.fromPath("/images/" + image.getIdentifier() + "/download").build(image.getIdentifier());
+            Class<?>ir = ImagesResource.class;
+            location = createPath(ir, METHOD_GET_IMAGE_FILE, image.getIdentifier()).or( HomeResource.HOME );
         } catch (Exception x) {
         }
-        executorService.execute(new ScanImage(hardware, storage, scannerName, image.getIdentifier()));
+        executorService.execute(new ScanImage(hardware, storage, scannerName, image.getIdentifier(),options));
         
-        // return the response
-        return Response.ok(image).location(location).build();
+        // build a response
+        Class<?> ir = ImagesResource.class;
+        
+        Representation response = 
+                hal.newRepresentation(
+                        createPath(ir, METHOD_GET_IMAGE_FILE,iid).get())
+                   .withLink(createRelation(ScannersResource.class), 
+                        createPath(ScannersResource.class).get())
+                   .withBean(image);
+        return Response.ok(response.toString( HAL_JSON) ).location(location).build();
     }
+    
 
     /**
      * Gets scanner options that can be set
@@ -172,14 +200,5 @@ public class ScannersResource {
         return Response.serverError().build();
     }
 
-    @Path("/{scannerId}/options")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response setScannerOptions(@PathParam("scannerId") String scannerId) {
-        try {
-            hardware.getScanDeviceOptions(scannerId);
-        } catch (IllegalArgumentException x) {
-        }
-        return Response.serverError().build();
-    }
+   
 }

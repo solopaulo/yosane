@@ -1,4 +1,4 @@
-package au.com.twobit.yosane.service.di;
+package au.com.twobit.yosane.service.guice;
 
 import au.com.twobit.yosane.service.device.ScanHardware;
 import au.com.twobit.yosane.service.device.sane.SaneScanHardware;
