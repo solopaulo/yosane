@@ -29,21 +29,10 @@ public class MockSaneDependencyModule extends AbstractModule {
             return;
         }
         done = true;
-        Device device = new Device();
-        device.setName("mustek:0xs41s92");
-        device.setModel("McMuster");
-        device.setType("Flatbed A3 Scanner");
-        device.setVendor("Mustek");
-        device.setId( coder.encodeString(device.getName()));
-        devices.add(device);
-        
-        device = new Device();
-        device.setName("fujitsu:00sd9x8");
-        device.setModel("Firewire Flatbed Scanner");
-        device.setType("Slimline Flatbed");
-        device.setVendor("Fujitsu");
-        device.setId(coder.encodeString(device.getName()));
-        devices.add(device);
+        String name = "mustek:0xs41s92";
+        devices.add(new Device("Mustek","McMuster","Flatbed A3 Scanner",name,coder.encodeString(name)));
+        name = "fujitsu:00sd9x8";
+        devices.add( new Device("Fujitsu","Firewire Flatbed Scanner","Slimline Flatbed",name,coder.encodeString(name)) );
     }
     
     @Override

@@ -20,12 +20,8 @@ public class TransformSaneDeviceToDevice implements Function<SaneDevice, Device>
         if ( device == null ) {
             return null;
         }
-        Device d = new Device();
-        d.setVendor(device.getVendor());
-        d.setModel(device.getModel());
-        d.setType(device.getType());
-        d.setName(device.getName());
-        d.setId(coder.encodeString(device.getName()));
+        String name = device.getName();
+        Device d = new Device(device.getVendor(),device.getModel(),device.getType(),name,coder.encodeString(name));
         return d;
     }
 

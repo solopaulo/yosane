@@ -30,9 +30,11 @@ public class YosaneGuiceModule extends AbstractModule {
         configureMiscellany();     
         configureExecutorService();
         configureYosaneSettings();
-        MockSaneDependencyModule m = new MockSaneDependencyModule();
-        requestInjection(m);
-        install( m );
+        install( new SaneDependencyModule() );
+//        
+//        MockSaneDependencyModule m = new MockSaneDependencyModule();
+//        requestInjection(m);
+//        install( m );
     }
 
     private void configureYosaneSettings() {

@@ -5,58 +5,49 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 public class DeviceOption {
-	@NotNull private String name;
-	private String description;
-	private String title;
-	private String type;
-	@NotNull private String value;
-	private List<String>values;
+	@NotNull final private String name;
+	final private String description;
+	final private String title;
+	final private String type;
+	@NotNull final private String value;
+	final private List<String> range;
+	final private String constraintType; 
 
+	public DeviceOption(String name, String description, String title, String type, String constraintType, String value, List<String> range) {
+        this.title = title;
+        this.value = value;
+        this.range = range;
+        this.type = type;
+        this.description = description;
+        this.name = name;
+        this.constraintType = constraintType;
+	}
+	
 	public String getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public List<String> getValues() {
-		return values;
-	}
-
-	public void setValues(List<String> values) {
-		this.values = values;
+	public List<String> getRange() {
+	    return range;
 	}
 
 	public String getTitle() {
 		return title;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getType() {
 		return type;
 	}
-
-	public void setType(String type) {
-		this.type = type;
+	
+	public String getConstraintType() {
+	    return constraintType;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 }

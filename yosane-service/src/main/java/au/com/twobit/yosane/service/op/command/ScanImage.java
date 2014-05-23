@@ -30,7 +30,7 @@ public class ScanImage implements Runnable {
             // write the status to file
             storage.updateStatus(ImageStatus.SCANNING, imageIdentifier);
             // acquire the image
-            BufferedImage bi = hardware.acquireImage(scannerName, imageIdentifier);
+            BufferedImage bi = hardware.acquireImage(scannerName, imageIdentifier, options.toArray(new DeviceOption[]{}));
             // update the status and write to file
             storage.updateStatus(ImageStatus.PROCESSING, imageIdentifier);
             // store the image

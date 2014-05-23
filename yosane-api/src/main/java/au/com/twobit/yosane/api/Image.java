@@ -1,26 +1,25 @@
 package au.com.twobit.yosane.api;
 
 public class Image {
-	private String identifier;
-	private String outputFormat;
-	private ImageStatus status;
+	final private String identifier;
+	final private String outputFormat;
+	final private ImageStatus status;
+	
+	public Image(String identifier, String outputFormat, ImageStatus status) {
+	    this.identifier = identifier;
+	    this.outputFormat = outputFormat;
+	    this.status = status;
+	}
 	
 	public ImageStatus getStatus() {
 		return status;
 	}
-	public void setStatus(ImageStatus status) {
-		this.status = status;
-	}
+	
 	public String getIdentifier() {
 		return identifier;
 	}
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
+	
 	public String getOutputFormat() {
 		return outputFormat;
-	}
-	public void setOutputFormat(String outputFormat) {
-		this.outputFormat = outputFormat;
 	}
 }

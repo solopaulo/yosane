@@ -38,6 +38,8 @@ public class SaneScanHardware implements ScanHardware {
     final private int sanePort;
     final private InetAddress saneAddress;
     private Cache<String, Object> cache;
+    private TransformSaneDeviceToDevice transformSaneDevice;
+    
 
     @Inject
     public SaneScanHardware(@Named("saneHost") String saneHost, @Named("sanePort") int sanePort) throws UnknownHostException {
@@ -45,9 +47,15 @@ public class SaneScanHardware implements ScanHardware {
         this.sanePort = sanePort;
         initializeCache();
     }
+    
+    @Inject
+    public void setTransformSaneDevice(TransformSaneDeviceToDevice transformSaneDevice) {
+        this.transformSaneDevice = transformSaneDevice;
+    }
+    
 
     private void initializeCache() {
-        cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.MINUTES).build();
+        cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).build();
     }
 
     /**
@@ -68,7 +76,7 @@ public class SaneScanHardware implements ScanHardware {
                     SaneSession session = null;
                     try {
                         session = createSaneSession();
-                        devices.addAll(Collections2.transform(session.listDevices(), new TransformSaneDeviceToDevice()));
+                        devices.addAll(Collections2.transform(session.listDevices(), transformSaneDevice));
                     } catch (Exception x) {
                         x.printStackTrace();
                         // log error
@@ -133,7 +141,7 @@ public class SaneScanHardware implements ScanHardware {
             options = (List<DeviceOption>) cache.get(key, new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
-                    return getScanDeviceOptions(scanDeviceIdentifier);
+                    return getScanDeviceOptionsFromSane(scanDeviceIdentifier);
                 }
             });
         } catch (ExecutionException x) {

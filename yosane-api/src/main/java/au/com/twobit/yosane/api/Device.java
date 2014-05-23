@@ -4,46 +4,47 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Device {
 	
-	private String vendor;
-	private String model;
-	private String type;	
-	private String name;
-	private String id;
+	private final String vendor;
+	private final String model;
+	private final String type;	
+	private final String name;
+	private final String id;
+	
+	public Device(String vendor, String model, String type, String name, String id) {
+	    this.vendor = vendor;
+	    this.model = model;
+	    this.type = type;
+	    this.name = name;
+	    this.id = id;
+	}
 	
 	@JsonProperty
 	public String getVendor() {
 		return vendor;
 	}
-	public void setVendor(String vendor) {
-		this.vendor = vendor;
-	}
+	
+
 	@JsonProperty
 	public String getModel() {
 		return model;
 	}
-	public void setModel(String model) {
-		this.model = model;
-	}
+	
+
 	@JsonProperty
 	public String getType() {
 		return type;
 	}
-	public void setType(String type) {
-		this.type = type;
-	}
+	
+
 	@JsonProperty
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
 	
+
 	@JsonProperty
 	public String getId() {
 		return id;
 	}
-	public void setId(String id) {
-		this.id = id;
-	}
+	
 }

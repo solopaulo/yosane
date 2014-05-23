@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -23,6 +22,7 @@ import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.image.RotateDirection;
 import au.com.twobit.yosane.service.op.command.ImageRotation;
+import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.storage.Storage;
 
 import com.google.inject.Inject;
@@ -32,7 +32,9 @@ import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 
 @Path("/images")
 public class ImagesResource {
-    public static final String METHOD_GET_IMAGE_FILE = "GET IMAGE FILE";
+    public static final String METHOD_GET_IMAGE_FILE    = "GET IMAGE FILE";
+    public static final String METHOD_GET_IMAGE_THUMB   = "GET IMAGE THUMB";
+    public static final String METHOD_IMAGE_ROTATE      = "IMAGE ROTATE";
     
     private Storage storage;
     private ExecutorService executorService;
@@ -52,13 +54,8 @@ public class ImagesResource {
     @Path("/{imageId}")
     public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
         ImageStatus status = storage.getStatus(imageIdentifier);
-        Image image = new Image();
-        image.setIdentifier(imageIdentifier);
-        image.setOutputFormat( ImageFormat.png.name() );
-        image.setStatus(status);
-        
+        Image image = new Image(imageIdentifier,ImageFormat.png.name(),status);
         String pathbase = String.format("%s/%s",getClass().getAnnotation(Path.class).value(),imageIdentifier);
-        
         Representation response = 
                 hal.newRepresentation(pathbase)
                    .withLink("scan", "/scanners")
@@ -76,7 +73,7 @@ public class ImagesResource {
     @Path("/{imageId}/file")
     @Produces("image/png")
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    @Named(METHOD_GET_IMAGE_FILE)
+    @Relation(relation="image-download", method=METHOD_GET_IMAGE_FILE)
     public Response getImageFile(@PathParam("imageId") String imageIdentifier) {
         try {
             storage.assertStatus(imageIdentifier, ImageStatus.READY);
@@ -94,6 +91,7 @@ public class ImagesResource {
     @GET
     @Path("/{imageId}/file/thumb")
     @Produces("image/png")
+    @Relation(relation="image-download-thumb",method=METHOD_GET_IMAGE_THUMB)
     public Response getImageThumb(@PathParam("imageId") String imageIdentifier) {
         try {
             storage.assertStatus(imageIdentifier, ImageStatus.READY);
