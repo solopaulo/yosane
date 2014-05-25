@@ -30,6 +30,7 @@ public class TransformSaneOptionToDeviceOption implements Function<SaneOption, D
             dopt = new DeviceOption(
                     option.getName(),
                     option.getDescription(),
+                    option.getGroup() == null ? "" : option.getGroup().getTitle(),
                     option.getTitle(),
                     option.getType().name(),
                     option.getConstraintType().name(),
@@ -44,9 +45,10 @@ public class TransformSaneOptionToDeviceOption implements Function<SaneOption, D
     }
 
     String getValueAsAString(SaneOption option) throws Exception {
-        if ( option == null || option.getType() == null || !(option.isActive() && option.isWriteable()) ) {
+        if ( option == null || option.getType() == null ||  !(option.isActive() && option.isWriteable()) ) {
             return null;
         }
+        
         
         String value = null;
         try {
@@ -84,7 +86,7 @@ public class TransformSaneOptionToDeviceOption implements Function<SaneOption, D
         List<String> value = Lists.newArrayList();
         
         if ( option == null ||
-             option.getConstraintType() == null || 
+             option.getConstraintType() == null ||
              option.getConstraintType() == OptionValueConstraintType.NO_CONSTRAINT ||
              ! (option.isActive() && 
                 option.isWriteable()) ) {

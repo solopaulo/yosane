@@ -1,42 +1,47 @@
 package au.com.twobit.yosane.service.dw;
 
 import io.dropwizard.Application;
-import io.dropwizard.lifecycle.Managed;
+import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.concurrent.ExecutorService;
 
 import au.com.twobit.yosane.service.dw.healthcheck.ScannersAvailable;
+import au.com.twobit.yosane.service.dw.task.ImageCleanupTask;
 import au.com.twobit.yosane.service.guice.YosaneGuiceModule;
+import au.com.twobit.yosane.service.resource.DocumentsResource;
 import au.com.twobit.yosane.service.resource.HomeResource;
 import au.com.twobit.yosane.service.resource.ImagesResource;
 import au.com.twobit.yosane.service.resource.ScannersResource;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 public class YosaneService extends Application<YosaneServiceConfiguration> {
 
-    // initialise Guice with our custom thingies that we like to inject
-    final private Injector injector;
+    private Injector injector;
     
     public YosaneService() {
-        injector = Guice.createInjector(new YosaneGuiceModule());
     }
         
     @Override
     public void initialize(Bootstrap<YosaneServiceConfiguration> configuration) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void run(YosaneServiceConfiguration configuration, Environment env) throws Exception {
+        // setup an executor service
+        ExecutorService executorService = env.lifecycle().executorService("async").maxThreads(3).build();
+        YosaneGuiceModule module = new YosaneGuiceModule(executorService);
+        
+        injector = Guice.createInjector(module);
         // add resource for home
         env.jersey().register(injector.getInstance(HomeResource.class));
         // add resource for scanner
@@ -44,12 +49,11 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         // add resource for image
         env.jersey().register(injector.getInstance(ImagesResource.class));
         // add resource for document
-        
+        env.jersey().register(injector.getInstance(DocumentsResource.class));
         // add health check
         env.healthChecks().register("Scanner Availability", injector.getInstance(ScannersAvailable.class));
-
-        // add managed class to shutdown executor service
-        env.lifecycle().manage(injector.getInstance(Key.get(Managed.class, Names.named("async"))));
+        
+        env.admin().addTask( injector.getInstance( ImageCleanupTask.class ) );
     }
 
     public static void main(String[] args) {

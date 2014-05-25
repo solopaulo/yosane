@@ -90,4 +90,9 @@ public interface Storage {
      */
     public void assertStatus(String imageIdentifier, ImageStatus status) throws StorageException;
     
+    
+    /** Clean up any resources created by unused by the storage service
+     * 
+     */
+    public void cleanup();
 }

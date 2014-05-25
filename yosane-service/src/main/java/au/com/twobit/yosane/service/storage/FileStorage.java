@@ -4,8 +4,19 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
+
+import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.twobit.yosane.api.ImageStatus;
 
@@ -17,6 +28,7 @@ import com.google.inject.name.Named;
 public class FileStorage implements Storage {
     private String holdingArea;
     private String imageOutputFormat;
+    private Logger log = LoggerFactory.getLogger(getClass());
     private final static String IMAGE_FILE_NAME = "image";
     private final static String THUMB_FILE_NAME = "thumb";
     private final static String STATUS_FILE_NAME = "status";
@@ -89,7 +101,11 @@ public class FileStorage implements Storage {
     public ImageStatus getStatus(String imageIdentifier) throws StorageException {
         String filepath = Joiner.on(File.separator).join(holdingArea, imageIdentifier, STATUS_FILE_NAME);
         try {
-            return ImageStatus.valueOf(Files.toString(new File(filepath), Charset.defaultCharset()));
+            File file = new File(filepath);
+            if ( ! file.exists() ) {
+                return ImageStatus.MISSING;
+            }
+            return ImageStatus.valueOf(Files.toString(file, Charset.defaultCharset()));
         } catch (Exception x) {
         }
         return ImageStatus.FAILED;
@@ -117,4 +133,36 @@ public class FileStorage implements Storage {
         return imagedir;
     }
 
+    @Override
+    public void cleanup() {
+        final Path path = Paths.get( new File(holdingArea).toURI() );
+        final long ts = getDeleteTime();
+        
+        try {
+            java.nio.file.Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException arg1) throws IOException {
+                    if ( dir.toFile().list().length == 0 && ! dir.equals( path ) ) {
+                       java.nio.file.Files.delete(dir);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes arg1) throws IOException {                    
+                    File df = file.toFile();
+                    if ( df.lastModified() < ts ) {
+                        java.nio.file.Files.delete(file);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (Exception x) {
+            x.printStackTrace();
+        }
+    }
+
+    protected long getDeleteTime() {
+        
+        return DateUtils.addSeconds(new Date(), -15).getTime();
+    }
 }

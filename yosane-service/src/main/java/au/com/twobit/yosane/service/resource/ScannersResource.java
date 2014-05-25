@@ -1,6 +1,6 @@
 package au.com.twobit.yosane.service.resource;
 
-import static au.com.twobit.yosane.service.resource.ImagesResource.METHOD_GET_IMAGE_FILE;
+import static au.com.twobit.yosane.service.resource.ImagesResource.METHOD_GET_IMAGE_DETAILS;
 import static au.com.twobit.yosane.service.resource.ResourceHelper.createLink;
 import static au.com.twobit.yosane.service.resource.ResourceHelper.createRelation;
 import static com.theoryinpractise.halbuilder.api.RepresentationFactory.HAL_JSON;
@@ -52,11 +52,12 @@ public class ScannersResource {
     final static String METHOD_GET_SCANNER = "GET SCANNER";
     final static String METHOD_GET_OPTIONS = "GET OPTIONS";
     
-    private Logger log = LoggerFactory.getLogger(getClass());
-    private final String ERROR_SCANNER_OPTIONS  = "error.scanner.options";
-    private final String ERROR_SCANNER_ACQUIRE  = "error.scanner.acquire";
-    private final String ERROR_SCANNER_DETAIL   = "error.scanner.detail";
-    private final String ERROR_SCANNER_LIST     = "error.scanner.list";
+    
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final String ERROR_SCANNER_OPTIONS  = "error_scanner_options";
+    private final String ERROR_SCANNER_ACQUIRE  = "error_scanner_acquire";
+    private final String ERROR_SCANNER_DETAIL   = "error_scanner_detail";
+    private final String ERROR_SCANNER_LIST     = "error_scanner_list";
 
     /* an interface used to talk to scanner hardware */
     final private ScanHardware hardware;
@@ -160,14 +161,14 @@ public class ScannersResource {
         URI location = null;
         Class<?>ir = ImagesResource.class;
         // build a response
-        Representation response = hal.newRepresentation( createLink(ir, METHOD_GET_IMAGE_FILE,iid).getHref());
+        Representation response = hal.newRepresentation( createLink(ir, METHOD_GET_IMAGE_DETAILS,iid).getHref());
         
         // dispatch a scanning request
         String scannerName = null;
         try {
             scannerName = coder.decodeString(scannerId);
             executorService.execute(new ScanImage(hardware, storage, scannerName, iid,options));
-            location = new URI(createLink(ir, METHOD_GET_IMAGE_FILE, iid).getHref());
+            location = new URI(createLink(ir, METHOD_GET_IMAGE_DETAILS, iid).getHref());
         } catch (Exception x) {
             return ResourceHelper.generateErrorResponse(response, ERROR_SCANNER_ACQUIRE, x.getMessage());
         }
@@ -194,7 +195,6 @@ public class ScannersResource {
             List<DeviceOption> options = hardware.getScanDeviceOptions(coder.decodeString(scannerId));
             response.withProperty("options",options);
         } catch (Exception x) {
-            x.printStackTrace();
             return ResourceHelper.generateErrorResponse(response, ERROR_SCANNER_OPTIONS, x.getMessage());
         }
         return Response.ok(response.toString( HAL_JSON ) ).build();

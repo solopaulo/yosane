@@ -32,6 +32,7 @@ public class ErrorsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Relation(relation="error",method=METHOD_ERROR_HELP)
+    @Path("/{errorCode}")
     public Response errorHelp(@PathParam("errorCode") String errorCode) {
         Representation response = 
                 hal.newRepresentation( UriBuilder.fromResource(getClass()).build())

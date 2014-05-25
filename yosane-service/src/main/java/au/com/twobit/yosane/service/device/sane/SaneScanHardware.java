@@ -11,7 +11,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.southsky.jfreesane.OptionValueType;
 import au.com.southsky.jfreesane.SaneDevice;
+import au.com.southsky.jfreesane.SaneOption;
 import au.com.southsky.jfreesane.SanePasswordProvider;
 import au.com.southsky.jfreesane.SaneSession;
 import au.com.twobit.yosane.api.Device;
@@ -22,7 +24,9 @@ import au.com.twobit.yosane.service.transform.TransformSaneDeviceToDevice;
 import au.com.twobit.yosane.service.transform.TransformSaneOptionToDeviceOption;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Collections2;
@@ -31,7 +35,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 public class SaneScanHardware implements ScanHardware {
-    final Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
     final public static int DEFAULT_SANE_PORT = 6566;
     final private String CACHE_KEY_DEVICES = "cache_devices";
     final private String CACHE_KEY_DEVICE_OPTIONS = "cache_options";
@@ -40,7 +44,6 @@ public class SaneScanHardware implements ScanHardware {
     private Cache<String, Object> cache;
     private TransformSaneDeviceToDevice transformSaneDevice;
     
-
     @Inject
     public SaneScanHardware(@Named("saneHost") String saneHost, @Named("sanePort") int sanePort) throws UnknownHostException {
         saneAddress = InetAddress.getByName(saneHost);
@@ -55,7 +58,7 @@ public class SaneScanHardware implements ScanHardware {
     
 
     private void initializeCache() {
-        cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).build();
+        cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
     }
 
     /**
@@ -134,7 +137,7 @@ public class SaneScanHardware implements ScanHardware {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public List<DeviceOption> getScanDeviceOptions(final String scanDeviceIdentifier) {
+    public List<DeviceOption> getScanDeviceOptions(final String scanDeviceIdentifier) throws IllegalArgumentException {
         String key = Joiner.on("_").join(CACHE_KEY_DEVICE_OPTIONS, scanDeviceIdentifier);
         List<DeviceOption> options = null;
         try {
@@ -145,7 +148,7 @@ public class SaneScanHardware implements ScanHardware {
                 }
             });
         } catch (ExecutionException x) {
-            // log error!
+            throw new IllegalArgumentException(x.getCause().getMessage());
         }
         return options;
     }
@@ -156,10 +159,11 @@ public class SaneScanHardware implements ScanHardware {
      * @param scanDeviceIdentifier
      * @return
      */
-    List<DeviceOption> getScanDeviceOptionsFromSane(final String scanDeviceIdentifier) {
+    List<DeviceOption> getScanDeviceOptionsFromSane(final String scanDeviceIdentifier) throws Exception{
         List<DeviceOption> options = Lists.newArrayList();
         SaneSession session = null;
         SaneDevice device = null;
+        String capturedError = null;
         try {
             // get a list of devices from sane
             session = createSaneSession();
@@ -167,14 +171,18 @@ public class SaneScanHardware implements ScanHardware {
             device.open();
             options.addAll(Collections2.transform(device.listOptions(), new TransformSaneOptionToDeviceOption()));
         } catch (Exception x) {
-            x.printStackTrace();
-            // warning
+            log.error(x.getMessage());
+            capturedError = String.format("Unable to get device options: %s",x.getMessage());
         } finally {
             try {
                 device.close();
             } catch (Exception x) {
             }
             closeSaneSession(session);
+        }
+        // if there was an error prior to closing the device, throw it
+        if ( ! Strings.isNullOrEmpty(capturedError) ) {
+            throw new Exception(capturedError);
         }
         return options;
     }
@@ -213,12 +221,17 @@ public class SaneScanHardware implements ScanHardware {
             if (options != null && options.length > 0) {
                 // get the option list and set options as appropriate
                 for (DeviceOption option : options) {
-                    device.getOption(option.getTitle()).setStringValue(option.getValue());
+                    SaneOption so  = device.getOption(option.getName());
+                    if ( so == null ) {
+                        continue;
+                    }
+                    setSaneOptionValue(so,option.getValue());
                 }
             }
             // acquire the image
             image = device.acquireImage();
         } catch (Exception x) {
+            x.printStackTrace();
             // error
             log.error("Unable to open device with identifier: {}", scanDeviceIdentifier);
             throw new AcquisitionException(String.format("Scan failed: %s", x.getMessage()), x);
@@ -226,6 +239,35 @@ public class SaneScanHardware implements ScanHardware {
             closeSaneSession(session);
         }
         return image;
+    }
+
+    private void setSaneOptionValue(SaneOption so, String value) {
+        if ( so == null ) {
+            return;
+        } else  if ( Strings.isNullOrEmpty(value) && so.getType() != OptionValueType.STRING ) {
+            return;
+        }
+        value = Optional.fromNullable(value).or("");
+        try {
+            switch(so.getType()) {
+                case BOOLEAN:
+                    so.setBooleanValue( Boolean.valueOf(value) );
+                    break;
+                case FIXED:
+                    so.setFixedValue( Double.parseDouble( value ) );
+                    break;
+                case INT:
+                    so.setIntegerValue( Integer.parseInt(value) );
+                    break;
+                case STRING:
+                    so.setStringValue(value);
+                    break;
+                default:
+            }
+        } catch (Exception x) {
+            x.printStackTrace();
+            return;
+        }
     }
 
     /* Create a new sane session */

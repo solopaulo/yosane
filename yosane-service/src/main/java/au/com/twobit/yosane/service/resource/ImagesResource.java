@@ -1,6 +1,7 @@
 package au.com.twobit.yosane.service.resource;
 
 import static au.com.twobit.yosane.service.image.ImageFormat.png;
+import static au.com.twobit.yosane.service.resource.ResourceHelper.createLink;
 import static au.com.twobit.yosane.service.image.ImageUtils.createByteArrayFromImage;
 import io.dropwizard.jersey.caching.CacheControl;
 
@@ -27,6 +28,7 @@ import au.com.twobit.yosane.service.storage.Storage;
 
 import com.google.inject.Inject;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
+import com.theoryinpractise.halbuilder.api.Link;
 import com.theoryinpractise.halbuilder.api.Representation;
 import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 
@@ -35,6 +37,8 @@ public class ImagesResource {
     public static final String METHOD_GET_IMAGE_FILE    = "GET IMAGE FILE";
     public static final String METHOD_GET_IMAGE_THUMB   = "GET IMAGE THUMB";
     public static final String METHOD_IMAGE_ROTATE      = "IMAGE ROTATE";
+    public static final String METHOD_GET_IMAGE_DETAILS = "IMAGE ROTATE";
+    public static final String ERROR_IMAGE_MISSING      = "error_image_missing";
     
     private Storage storage;
     private ExecutorService executorService;
@@ -52,17 +56,23 @@ public class ImagesResource {
      */
     @GET
     @Path("/{imageId}")
+    @Relation(relation="image",method=METHOD_GET_IMAGE_DETAILS)
     public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
         ImageStatus status = storage.getStatus(imageIdentifier);
         Image image = new Image(imageIdentifier,ImageFormat.png.name(),status);
         String pathbase = String.format("%s/%s",getClass().getAnnotation(Path.class).value(),imageIdentifier);
-        Representation response = 
-                hal.newRepresentation(pathbase)
-                   .withLink("scan", "/scanners")
-                   .withLink("image-rotate", String.format("%s/rotate",pathbase))
-                   .withLink("image-download", String.format("%s/file",pathbase))
-                   .withLink("image-download-thumb", String.format("%s/file/thumb",pathbase))
-                   .withBean(image);
+        Link home = createLink(HomeResource.class);
+        Link scanners = createLink(ScannersResource.class);
+        Representation response = hal.newRepresentation(pathbase)
+                .withLink( home.getRel(), home.getHref())
+                .withLink( scanners.getRel(), scanners.getHref());
+        if ( status == ImageStatus.MISSING ) {
+            return ResourceHelper.generateErrorResponse(response, ERROR_IMAGE_MISSING, "Image is no longer available");
+        }
+        response.withLink("image-rotate", String.format("%s/rotate",pathbase))
+                .withLink("image-download", String.format("%s/file",pathbase))
+                .withLink("image-download-thumb", String.format("%s/file/thumb",pathbase))
+                .withBean(image);
         return Response.ok(response.toString( RepresentationFactory.HAL_JSON)).build();
     }
 

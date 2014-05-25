@@ -1,9 +1,6 @@
 package au.com.twobit.yosane.service.guice;
 
-import io.dropwizard.lifecycle.Managed;
-
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
@@ -15,20 +12,27 @@ import au.com.twobit.yosane.service.utils.URLEncodeDecode;
 import au.com.twobit.yosane.service.utils.UUIDTicketGenerator;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.json.JsonRepresentationFactory;
 
 public class YosaneGuiceModule extends AbstractModule {
 
-    public YosaneGuiceModule() {
+    final private ExecutorService executorService;
+    
+    public YosaneGuiceModule(ExecutorService executorService) {
+        this.executorService = executorService;
     }
 
+    @Provides
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
     @Override
     protected void configure() {
         configureHalBuilder();
         configureMiscellany();     
-        configureExecutorService();
         configureYosaneSettings();
         install( new SaneDependencyModule() );
 //        
@@ -48,20 +52,6 @@ public class YosaneGuiceModule extends AbstractModule {
         // set the default thumbnail scale length (width)
         requestStaticInjection(CreateThumbnail.class);
         bind(Integer.class).annotatedWith(Names.named("scaleWidth")).toInstance(320);        
-    }
-
-    private void configureExecutorService() {
-        // start a new executor service for background tasks
-        int maxThreads = 3;
-        final ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
-        bind(ExecutorService.class).toInstance(executorService);
-        bind(Managed.class).annotatedWith(Names.named("async")).toInstance(new Managed() {
-            @Override public void start() throws Exception { }
-            @Override
-            public void stop() throws Exception {
-                executorService.shutdown();
-            }
-        });
     }
 
     private void configureMiscellany() {

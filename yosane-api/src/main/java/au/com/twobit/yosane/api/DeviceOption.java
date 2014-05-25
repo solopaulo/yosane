@@ -5,16 +5,21 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 public class DeviceOption {
-	@NotNull final private String name;
-	final private String description;
-	final private String title;
-	final private String type;
-	@NotNull final private String value;
-	final private List<String> range;
-	final private String constraintType; 
+	@NotNull  private String name;
+	 private String description;
+	private String group;
+	private String title;
+	 private String type;
+	@NotNull  private String value;
+	 private List<String> range;
+	 private String constraintType; 
 
-	public DeviceOption(String name, String description, String title, String type, String constraintType, String value, List<String> range) {
+	public DeviceOption() {
+	    
+	}
+	public DeviceOption(String name, String description, String group, String title, String type, String constraintType, String value, List<String> range) {
         this.title = title;
+        this.group = group;
         this.value = value;
         this.range = range;
         this.type = type;
@@ -27,6 +32,10 @@ public class DeviceOption {
 		return value;
 	}
 
+	public String getGroup() {
+	    return group;
+	}
+	
 	public List<String> getRange() {
 	    return range;
 	}
