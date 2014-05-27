@@ -1,9 +1,10 @@
 package au.com.twobit.yosane.service.dw.healthcheck;
 
+import javax.inject.Inject;
+
 import au.com.twobit.yosane.service.device.ScanHardware;
 
 import com.codahale.metrics.health.HealthCheck;
-import com.google.inject.Inject;
 
 public class ScannersAvailable extends HealthCheck {
 

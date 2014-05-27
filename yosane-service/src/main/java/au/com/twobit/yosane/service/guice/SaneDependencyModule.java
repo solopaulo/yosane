@@ -1,7 +1,5 @@
 package au.com.twobit.yosane.service.guice;
 
-import java.util.logging.Logger;
-
 import au.com.twobit.yosane.service.device.ScanHardware;
 import au.com.twobit.yosane.service.device.sane.SaneScanHardware;
 

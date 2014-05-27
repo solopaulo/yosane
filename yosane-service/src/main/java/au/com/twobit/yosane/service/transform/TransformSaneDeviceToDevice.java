@@ -1,11 +1,12 @@
 package au.com.twobit.yosane.service.transform;
 
+import javax.inject.Inject;
+
 import au.com.southsky.jfreesane.SaneDevice;
 import au.com.twobit.yosane.api.Device;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
 
 import com.google.common.base.Function;
-import com.google.inject.Inject;
 
 public class TransformSaneDeviceToDevice implements Function<SaneDevice, Device> {
     private EncodeDecode coder;

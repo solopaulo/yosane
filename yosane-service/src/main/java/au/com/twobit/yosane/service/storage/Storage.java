@@ -89,10 +89,5 @@ public interface Storage {
      * @throws StorageException - must throw a storage exception if the assertion fails
      */
     public void assertStatus(String imageIdentifier, ImageStatus status) throws StorageException;
-    
-    
-    /** Clean up any resources created by unused by the storage service
-     * 
-     */
-    public void cleanup();
+   
 }

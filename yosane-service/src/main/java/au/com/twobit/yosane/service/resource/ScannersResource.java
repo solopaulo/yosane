@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,7 +36,6 @@ import au.com.twobit.yosane.service.storage.Storage;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
 import au.com.twobit.yosane.service.utils.TicketGenerator;
 
-import com.google.inject.Inject;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Link;
 import com.theoryinpractise.halbuilder.api.Representation;

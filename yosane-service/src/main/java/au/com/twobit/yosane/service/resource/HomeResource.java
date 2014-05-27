@@ -2,7 +2,7 @@ package au.com.twobit.yosane.service.resource;
 
 import java.net.URI;
 
-import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -12,7 +12,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import au.com.twobit.yosane.service.resource.annotations.Relation;
 
-import com.google.inject.Inject;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Representation;
 

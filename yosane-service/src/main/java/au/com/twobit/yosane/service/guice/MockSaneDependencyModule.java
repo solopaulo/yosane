@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import au.com.twobit.yosane.api.Device;
 import au.com.twobit.yosane.api.DeviceOption;
@@ -12,7 +13,6 @@ import au.com.twobit.yosane.service.utils.EncodeDecode;
 
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
 
 public class MockSaneDependencyModule extends AbstractModule {
     final List<Device>devices = Lists.newArrayList();

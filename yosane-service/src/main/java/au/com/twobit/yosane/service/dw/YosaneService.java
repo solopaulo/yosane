@@ -1,25 +1,26 @@
 package au.com.twobit.yosane.service.dw;
 
 import io.dropwizard.Application;
-import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 
+import org.joda.time.Period;
+
 import au.com.twobit.yosane.service.dw.healthcheck.ScannersAvailable;
-import au.com.twobit.yosane.service.dw.task.ImageCleanupTask;
 import au.com.twobit.yosane.service.guice.YosaneGuiceModule;
 import au.com.twobit.yosane.service.resource.DocumentsResource;
 import au.com.twobit.yosane.service.resource.HomeResource;
 import au.com.twobit.yosane.service.resource.ImagesResource;
 import au.com.twobit.yosane.service.resource.ScannersResource;
+import au.com.twobit.yosane.service.storage.ArtifactCleanup;
 
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -52,8 +53,16 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         env.jersey().register(injector.getInstance(DocumentsResource.class));
         // add health check
         env.healthChecks().register("Scanner Availability", injector.getInstance(ScannersAvailable.class));
-        
-        env.admin().addTask( injector.getInstance( ImageCleanupTask.class ) );
+        // add a timer to run the artifact cleanup
+        new Timer().schedule( new TimerTask() {
+                @Override
+                public void run() {
+                    injector.getInstance(ArtifactCleanup.class).run();
+                }
+            }, 
+            Period.seconds(45).toStandardDuration().getMillis(),
+            Period.days(1).toStandardDuration().getMillis()
+         );
     }
 
     public static void main(String[] args) {

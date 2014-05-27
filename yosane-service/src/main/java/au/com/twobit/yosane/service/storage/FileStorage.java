@@ -4,17 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
 
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.apache.commons.lang.time.DateUtils;
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +16,6 @@ import au.com.twobit.yosane.api.ImageStatus;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class FileStorage implements Storage {
     private String holdingArea;
@@ -58,7 +50,7 @@ public class FileStorage implements Storage {
             if (image != null)
                 ImageIO.write(image, imageOutputFormat, new File(imageFilePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to save image to storage: {}",e.getMessage());
             throw new StorageException("Failed to write file to disk: " + e.getMessage());
         }
     }
@@ -80,6 +72,7 @@ public class FileStorage implements Storage {
         try {
             return ImageIO.read(file);
         } catch (Exception x) {
+            log.error("Failed to load image from storage: {}",x.getMessage());
             x.printStackTrace();
         }
         throw new StorageException("Unable to read from file with identifier " + imageIdentifier);
@@ -92,7 +85,7 @@ public class FileStorage implements Storage {
         try {
             Files.write(status.name().getBytes(), new File(filepath));
         } catch (Exception x) {
-            // log an error
+            log.error("Failed to update status for image: {}",x.getMessage());
             throw new StorageException(x.getMessage());
         }
     }
@@ -133,36 +126,4 @@ public class FileStorage implements Storage {
         return imagedir;
     }
 
-    @Override
-    public void cleanup() {
-        final Path path = Paths.get( new File(holdingArea).toURI() );
-        final long ts = getDeleteTime();
-        
-        try {
-            java.nio.file.Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException arg1) throws IOException {
-                    if ( dir.toFile().list().length == 0 && ! dir.equals( path ) ) {
-                       java.nio.file.Files.delete(dir);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes arg1) throws IOException {                    
-                    File df = file.toFile();
-                    if ( df.lastModified() < ts ) {
-                        java.nio.file.Files.delete(file);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (Exception x) {
-            x.printStackTrace();
-        }
-    }
-
-    protected long getDeleteTime() {
-        
-        return DateUtils.addSeconds(new Date(), -15).getTime();
-    }
 }

@@ -1,14 +1,15 @@
 package au.com.twobit.yosane.service.resource;
 
 import static au.com.twobit.yosane.service.image.ImageFormat.png;
-import static au.com.twobit.yosane.service.resource.ResourceHelper.createLink;
 import static au.com.twobit.yosane.service.image.ImageUtils.createByteArrayFromImage;
+import static au.com.twobit.yosane.service.resource.ResourceHelper.createLink;
 import io.dropwizard.jersey.caching.CacheControl;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,7 +27,6 @@ import au.com.twobit.yosane.service.op.command.ImageRotation;
 import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.storage.Storage;
 
-import com.google.inject.Inject;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Link;
 import com.theoryinpractise.halbuilder.api.Representation;
