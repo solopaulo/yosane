@@ -1,6 +1,8 @@
 package au.com.twobit.yosane.service.utils;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -10,6 +12,7 @@ import org.junit.Test;
 
 import au.com.twobit.yosane.service.resource.ImagesResource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theoryinpractise.halbuilder.api.Link;
 
 public class MiscTest {
@@ -43,5 +46,22 @@ public class MiscTest {
         Assert.assertTrue( InformalPeriod.addPeriodToDate("1w4d", now).isBefore(fifteenDaysFromNow));
         Assert.assertTrue( InformalPeriod.addPeriodToDate("2w3d",now).isAfter(fifteenDaysFromNow));
 
+    }
+    
+    @Test(expected=NullPointerException.class)
+    public void testArraysAsListWithNullParam() {
+        List<String> list = Arrays.asList((String[])null);
+        Assert.assertNotNull(list);
+    }
+    
+    @Test
+    public void testArraysAsListEmptyMakesListSizeZero() {
+        Assert.assertEquals(0,  Arrays.asList( new String [] { }).size());
+    }
+    
+    @Test
+    public void testJackson() {
+        ObjectMapper mapper = new ObjectMapper();
+        
     }
 }

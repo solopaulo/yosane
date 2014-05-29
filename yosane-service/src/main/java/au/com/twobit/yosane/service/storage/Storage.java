@@ -2,6 +2,7 @@ package au.com.twobit.yosane.service.storage;
 
 import java.awt.image.BufferedImage;
 
+import au.com.twobit.yosane.api.DocumentOfImages;
 import au.com.twobit.yosane.api.ImageStatus;
 
 /**
@@ -71,7 +72,7 @@ public interface Storage {
      * @throws StorageException
      *             If some error occurs when updating the status
      */
-    public void updateStatus(ImageStatus status, String imageIdentifier) throws StorageException;
+    public void updateImageStatus(ImageStatus status, String imageIdentifier) throws StorageException;
 
     /**
      * Gets the status of the image identifier provided
@@ -80,7 +81,7 @@ public interface Storage {
      *            the unique identifier for the image
      * @return - returns the ImageStatus for the image as discovered
      */
-    public ImageStatus getStatus(String imageIdentifier) throws StorageException;
+    public ImageStatus getImageStatus(String imageIdentifier) throws StorageException;
 
     /** Verifies the status is as requested
      * 
@@ -88,6 +89,24 @@ public interface Storage {
      * @param status the status we want to assert is correct
      * @throws StorageException - must throw a storage exception if the assertion fails
      */
-    public void assertStatus(String imageIdentifier, ImageStatus status) throws StorageException;
+    public void assertImageStatus(String imageIdentifier, ImageStatus status) throws StorageException;
+    
+    
+    /** Saves the document of images
+     * 
+     * @param document A document of images referencing some images that are still available
+     * @param documentIdentifier An identifier used to uniquely identify the document
+     * @throws StorageException - describes an error that caused the operation to fail
+     */
+    public void saveDocument(DocumentOfImages document, String documentIdentifier) throws StorageException;
+    
+    
+    /** Gets a document of images
+     * 
+     * @param documentIdentifier An identifier used to uniquely identify the document
+     * @return - Returns the DocumentOfImages referenced by the unique identifier
+     * @throws StorageException - describes an error that caused the operation to fail
+     */
+    public DocumentOfImages loadDocument(String documentIdentifier) throws StorageException;
    
 }

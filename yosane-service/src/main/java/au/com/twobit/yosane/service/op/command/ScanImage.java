@@ -28,11 +28,11 @@ public class ScanImage implements Runnable {
     public void run() {
         try {
             // write the status to file
-            storage.updateStatus(ImageStatus.SCANNING, imageIdentifier);
+            storage.updateImageStatus(ImageStatus.SCANNING, imageIdentifier);
             // acquire the image
             BufferedImage bi = hardware.acquireImage(scannerName, imageIdentifier, options.toArray(new DeviceOption[]{}));
             // update the status and write to file
-            storage.updateStatus(ImageStatus.PROCESSING, imageIdentifier);
+            storage.updateImageStatus(ImageStatus.PROCESSING, imageIdentifier);
             // store the image
             storage.saveImage(bi, imageIdentifier);
             // create thumbnail
@@ -42,11 +42,11 @@ public class ScanImage implements Runnable {
                 storage.saveImageThumbnail(thumbnail, imageIdentifier);
             }
             // update the status and write to file
-            storage.updateStatus(ImageStatus.READY, imageIdentifier);
+            storage.updateImageStatus(ImageStatus.READY, imageIdentifier);
         } catch (Exception x) {
             x.printStackTrace();
             try {
-                storage.updateStatus(ImageStatus.FAILED, imageIdentifier);
+                storage.updateImageStatus(ImageStatus.FAILED, imageIdentifier);
             } catch (Exception x1) {
                 x.printStackTrace();
             }

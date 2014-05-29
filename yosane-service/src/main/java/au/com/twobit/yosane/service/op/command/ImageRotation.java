@@ -38,7 +38,7 @@ public class ImageRotation implements Runnable {
         
         // update status to processing
         try {
-            storage.updateStatus(ImageStatus.PROCESSING, imageIdentifier);
+            storage.updateImageStatus(ImageStatus.PROCESSING, imageIdentifier);
         } catch (StorageException x) {
             x.printStackTrace();
             // log an error and return;

@@ -1,9 +1,12 @@
 package au.com.twobit.yosane.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Image {
-	final private String identifier;
-	final private String outputFormat;
-	final private ImageStatus status;
+	private String identifier;
+	private String outputFormat;
+	private ImageStatus status;
+	private int ordering;
 	
 	public Image(String identifier, String outputFormat, ImageStatus status) {
 	    this.identifier = identifier;
@@ -11,15 +14,30 @@ public class Image {
 	    this.status = status;
 	}
 	
+	public Image() {
+	    
+	}
+	
+	@JsonProperty
 	public ImageStatus getStatus() {
 		return status;
 	}
 	
+	@JsonProperty
 	public String getIdentifier() {
 		return identifier;
 	}
 	
 	public String getOutputFormat() {
 		return outputFormat;
+	}
+	
+	@JsonProperty
+	public int getOrdering() {
+	    return ordering;
+	}
+	
+	public void setOrdering(int ordering) {
+	    this.ordering = ordering;
 	}
 }

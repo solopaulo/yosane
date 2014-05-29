@@ -58,7 +58,7 @@ public class ImagesResource {
     @Path("/{imageId}")
     @Relation(relation="image",method=METHOD_GET_IMAGE_DETAILS)
     public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
-        ImageStatus status = storage.getStatus(imageIdentifier);
+        ImageStatus status = storage.getImageStatus(imageIdentifier);
         Image image = new Image(imageIdentifier,ImageFormat.png.name(),status);
         String pathbase = String.format("%s/%s",getClass().getAnnotation(Path.class).value(),imageIdentifier);
         Link home = createLink(HomeResource.class);
@@ -86,7 +86,7 @@ public class ImagesResource {
     @Relation(relation="image-download", method=METHOD_GET_IMAGE_FILE)
     public Response getImageFile(@PathParam("imageId") String imageIdentifier) {
         try {
-            storage.assertStatus(imageIdentifier, ImageStatus.READY);
+            storage.assertImageStatus(imageIdentifier, ImageStatus.READY);
             BufferedImage image = storage.loadImage(imageIdentifier);
             return Response.ok().entity(createByteArrayFromImage(image, png.name())).build();
         } catch (Exception x) {
@@ -104,7 +104,7 @@ public class ImagesResource {
     @Relation(relation="image-download-thumb",method=METHOD_GET_IMAGE_THUMB)
     public Response getImageThumb(@PathParam("imageId") String imageIdentifier) {
         try {
-            storage.assertStatus(imageIdentifier, ImageStatus.READY);
+            storage.assertImageStatus(imageIdentifier, ImageStatus.READY);
             BufferedImage image = storage.loadImageThumbnail(imageIdentifier);
             return Response.ok().entity(createByteArrayFromImage(image, png.name())).build();
         } catch (Exception x) {
@@ -121,7 +121,7 @@ public class ImagesResource {
     public Response rotateImageFile(@PathParam("imageId") String imageIdentifier, @QueryParam("direction") String rotation) {
         try {
             RotateDirection direction = RotateDirection.UNKNOWN;
-            storage.assertStatus(imageIdentifier, ImageStatus.READY);
+            storage.assertImageStatus(imageIdentifier, ImageStatus.READY);
             direction = RotateDirection.valueOf(rotation.toUpperCase());
             if ( direction == RotateDirection.UNKNOWN ) {
                 throw new Exception();
