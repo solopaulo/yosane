@@ -60,13 +60,10 @@ public class FileStorage implements Storage {
     }
 
     protected void save(BufferedImage image, String imageIdentifier, String filename) throws StorageException {
-        File imagedir = getPathFor(IMAGES,imageIdentifier);
-        // determine the path of the file
-        String imageFilePath = Joiner.on(File.separator).join(imagedir.getPath(), filename);
-        // write the image data to disk
+        File imageFile = getFileOf(IMAGES,imageIdentifier,filename);
         try {
             if (image != null) {
-                ImageIO.write(image, imageOutputFormat, new File(imageFilePath));
+                ImageIO.write(image, imageOutputFormat, imageFile);
             }
         } catch (IOException e) {
             log.error("Failed to save image to storage: {}",e.getMessage());
@@ -84,10 +81,16 @@ public class FileStorage implements Storage {
         return load(imageIdentifier, THUMB_FILE_NAME);
     }
 
+    
+    /** Loads an image from disk using ImageIO method
+     * 
+     * @param imageIdentifier The unique image identifier used to source the file
+     * @param filename The name of the file (e.g. the main image or the thumbnail)
+     * @return - Returns the BufferedImage data loaded from the file
+     * @throws StorageException if an error occcurs attempting to load the file
+     */
     protected BufferedImage load(String imageIdentifier, String filename) throws StorageException {
-        File imagedir = getPathFor(IMAGES,imageIdentifier);
-        String filepath = Joiner.on(File.separator).join(imagedir.getPath(), filename);
-        File file = new File(filepath);
+        File file = getFileOf(IMAGES,imageIdentifier,filename);
         try {
             return ImageIO.read(file);
         } catch (Exception x) {
@@ -99,10 +102,9 @@ public class FileStorage implements Storage {
 
     @Override
     public void updateImageStatus(ImageStatus status, String imageIdentifier) throws StorageException {
-        File imagedir = getPathFor(IMAGES,imageIdentifier);
-        String filepath = Joiner.on(File.separator).join(imagedir.getPath(), STATUS_FILE_NAME);
+        File imageStatusFile = getFileOf(IMAGES,imageIdentifier,STATUS_FILE_NAME);
         try {
-            Files.write(status.name().getBytes(), new File(filepath));
+            Files.write(status.name().getBytes(), imageStatusFile);
         } catch (Exception x) {
             log.error("Failed to update status for image: {}",x.getMessage());
             throw new StorageException(x.getMessage());
@@ -111,9 +113,8 @@ public class FileStorage implements Storage {
 
     @Override
     public ImageStatus getImageStatus(String imageIdentifier) throws StorageException {
-        String filepath = Joiner.on(File.separator).join(getPathFor(IMAGES,imageIdentifier), STATUS_FILE_NAME);
+        File file = getFileOf(IMAGES,imageIdentifier,STATUS_FILE_NAME);
         try {
-            File file = new File(filepath);
             if ( ! file.exists() ) {
                 return ImageStatus.MISSING;
             }
@@ -168,18 +169,35 @@ public class FileStorage implements Storage {
         return document;
     }
     
-
+    /* Gets a file handle to the file identified for the type of path provided, and additional parameters provided
+     * 
+     * @param pathFor A PathFor enum indicating whether the path is for images or documents
+     * @param identifier The required unique identifier used to identify an individual document
+     * @param extras Var args String parameters used to further build the file path
+     * @return - 
+     */
     protected File getFileOf(PathFor pathFor, String identifier, String ... extras) throws StorageException {
-        File f = getPathFor(pathFor,identifier);
+        File f = getPathFor(pathFor,identifier,true);
         String [] params = Lists.asList(f.getPath(), extras != null ? extras : new String [] { }).toArray(new String[]{});
         String filepath = Joiner.on(File.separator).join(params);
         return new File(filepath);
     }
-    protected File getPathFor(PathFor pathFor, String identifier) throws StorageException {
+    
+    
+    /* Gets a file handle to the directory indicated by the PathFor enum
+     * 
+     * @param pathFor A PathFor enum indicating whether the path is for images or documents
+     * @param identifier A unique identifier for an individual image or document
+     * @return - Returns a file handle to the directory. If the directory did not exist, an attempt
+     *           will be made to create it
+     */
+    protected File getPathFor(PathFor pathFor, String identifier,boolean noCreateDir) throws StorageException {
         // check storage is available first as that is probably cheaper option
         File location = new File(Joiner.on(File.separator).join(holdingArea,pathFor.path(), identifier));
-        // create dir if not exists
-        if (!(location.exists() || location.mkdirs())) {
+        // maybe create dir if not exists
+        if ( noCreateDir && ! location.exists() ) {
+            throw new StorageException("Path will not be created: " + location.getPath());
+        } else if ( ! (location.exists() || location.mkdirs())) {
             throw new StorageException("Path cannot be created: " + location.getPath());
         } else if (!(location.isDirectory() && location.canWrite())) {
             throw new StorageException("Path is not writable: " + location.getPath());
@@ -187,6 +205,12 @@ public class FileStorage implements Storage {
         return location;
     }
     
+    
+    /** Enumerates the different things this storage supports, e.g. Images, Documents and where they will be stored
+     * 
+     * @author paul
+     *
+     */
     protected enum PathFor {
         IMAGES("images"),
         DOCUMENTS("documents");

@@ -1,6 +1,7 @@
 package au.com.twobit.yosane.service.dw;
 
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -34,6 +35,7 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         
     @Override
     public void initialize(Bootstrap<YosaneServiceConfiguration> configuration) {
+        configuration.addBundle( new AssetsBundle("/assets","/assets"));
     }
 
     @Override

@@ -2,11 +2,13 @@ package au.com.twobit.yosane.api;
 
 import java.util.Collection;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DocumentOfImages {
     private String id;
-    private String name;
+    @NotNull private String name;
     private Collection<Image> images;
     
     public DocumentOfImages() {
@@ -30,7 +32,7 @@ public class DocumentOfImages {
     }
     
     @JsonProperty
-    public Collection<Image> getImageList() {
+    public Collection<Image> getImages() {
         return images;
     }
     

@@ -1,6 +1,9 @@
 package au.com.twobit.yosane.service.resource;
 
+import io.dropwizard.assets.AssetsBundle;
+
 import java.net.URI;
+import java.nio.charset.Charset;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -10,8 +13,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.eclipse.jetty.util.resource.FileResource;
+
 import au.com.twobit.yosane.service.resource.annotations.Relation;
 
+import com.google.common.io.Resources;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Representation;
 
@@ -39,5 +45,17 @@ public class HomeResource {
                 .withLink("images",ImagesResource.class.getAnnotation(Path.class).value())
                 .withLink("documents", DocumentsResource.class.getAnnotation(Path.class).value());
         return Response.ok( response.toString( DefaultRepresentationFactory.HAL_JSON ) ).build();
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response webHome() {
+        String index = null; 
+        try {
+            index = Resources.toString( Resources.getResource("assets/index.html").toURI().toURL(), Charset.defaultCharset() );
+            return Response.ok( index ).build();
+        } catch (Exception x) {
+            return Response.serverError().build();
+        }
     }
 }
