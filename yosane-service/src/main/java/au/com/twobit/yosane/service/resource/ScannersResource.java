@@ -98,7 +98,8 @@ public class ScannersResource {
     public Response getScannerList() {
         Representation response = hal.newRepresentation( createLink(ScannersResource.class).getHref() );
         try {
-            for (Device device : hardware.getListOfScanDevices()) {
+            List<Device>scanningDevices = hardware.getListOfScanDevices();
+            for (Device device : scanningDevices) {
                 response.withLink(
                         "scanner",
                         createLink(ScannersResource.class,METHOD_GET_SCANNER,device.getId()).getHref(),
@@ -107,6 +108,7 @@ public class ScannersResource {
                         null,
                         null);
             }
+            response.withProperty("scanners", scanningDevices);
         } catch (Exception x) {
             String error = String.format("Failed to get a list of scanner hardware devices: %s", x.getMessage()); 
             log.error(error);

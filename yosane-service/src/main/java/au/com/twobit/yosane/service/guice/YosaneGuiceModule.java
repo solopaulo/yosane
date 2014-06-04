@@ -36,11 +36,11 @@ public class YosaneGuiceModule extends AbstractModule {
         configureHalBuilder();
         configureMiscellany();     
         configureYosaneSettings();
-        install( new SaneDependencyModule() );
-//        
-//        MockSaneDependencyModule m = new MockSaneDependencyModule();
-//        requestInjection(m);
-//        install( m );
+//        install( new SaneDependencyModule() );
+        
+        MockSaneDependencyModule m = new MockSaneDependencyModule();
+        requestInjection(m);
+        install( m );
     }
 
     private void configureYosaneSettings() {
@@ -67,6 +67,7 @@ public class YosaneGuiceModule extends AbstractModule {
         // add a HAL representation factory to be re-used through resources
         DefaultRepresentationFactory jsonFactory = new JsonRepresentationFactory();
         jsonFactory.withFlag( DefaultRepresentationFactory.PRETTY_PRINT );
+        jsonFactory.withFlag( DefaultRepresentationFactory.SINGLE_ELEM_ARRAYS);
         bind(DefaultRepresentationFactory.class).toInstance( jsonFactory );        
    }
 
