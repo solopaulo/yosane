@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/assets/app/yosane.css">
   <script src="/assets/app/bower_components/angular/angular.js"></script>
   <script src="/assets/app/bower_components/angular-resource/angular-resource.js"></script>
+  <script src="/assets/app/bower_components/angular-route/angular-route.js"></script>
   <script src="/assets/app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
   <script src="/assets/app/components/services.js"></script>
   <script src="/assets/app/app.js"></script>
@@ -15,27 +16,49 @@
     
 
 </head>
-<body>
-	 <!-- Split button -->
-	 <div ng-controller="ScanningController" ng-model="scanners">
-	    <div class="btn-group" dropdown>
-	      <button type="button" class="btn btn-default">
-	           <span class="glyphicon glyphicon-inbox" style='margin-right:0.4em;'></span>
-	           Scan
-	      </button>
-	      <button type="button" class="btn btn-default dropdown-toggle">
+<body ng-controller="ScanningController" ng-model="scanners">
+	
+   <div class="row panel-header">
+	   <div class="btn-group" dropdown>
+        <button type="button" class="btn btn-success">Scan</button>
+	      <button type="button" class="btn btn-success dropdown-toggle">
 	        <span class="caret"></span>
 	        <span class="sr-only">Split button!</span>
 	      </button>
-	      <ul class="dropdown-menu" role="menu"  ng-model="scanners">
-	        <li ng-repeat="item in items" >
-	           <a ng-click=" alert('hallo world');" href="{{item.href}}">with <b>{{item.title}}</b></a>
-	        </li>
-	        
-	        <li class="divider"></li>
-	        <li><a href="#" ng-click="refresh()">Update Scanner List</a></li>
-	      </ul>
-	    </div>
+           <ul class="dropdown-menu" role="menu">
+            <li ng-repeat="item in items">
+               <a ng-click="selectScanner(item.name)" href="#">
+                   with <strong>{{item.title}}</strong>
+                   <span class="pull-right glyphicon glyphicon-ok" style='margin-right:0.4em;'
+                       ng-show="selected==item.name"></span> </a>	               
+            </li>
+            
+            <li class="divider"></li>
+            <li style='width:25em;'><a href="#" ng-click="refresh()"><em>Update Scanner List</em></a></li>
+           </ul> 
     </div>
+	
+   <div class="row">
+       
+   </div>
+   
+   <div class="row panel-footer col-lg-3 text-center">
+       <div class="btn-group">
+           <button class="btn btn-success" disabled="disabled">
+               <span class="glyphicon glyphicon-inbox" style='margin-right:0.4em;'></span>
+               Scanning
+           </button>
+           <button class="btn btn-info">
+               <span class="glyphicon glyphicon-picture" style='margin-right:0.4em;'></span>
+               Images
+           </button>
+           <button class="btn btn-danger">
+               <span class="glyphicon glyphicon-file" style='margin-right:0.4em;'></span>
+               
+               Documents
+           </button>
+       </div>
+   </div>
+	  
 </body>
 </html>

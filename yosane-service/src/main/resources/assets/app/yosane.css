@@ -1,2 +1,3 @@
 @CHARSET "UTF-8";
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+body { padding:1em;}
