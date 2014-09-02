@@ -69,9 +69,9 @@ public class ImagesResource {
         if ( status == ImageStatus.MISSING ) {
             return ResourceHelper.generateErrorResponse(response, ERROR_IMAGE_MISSING, "Image is no longer available");
         }
-        response.withLink("image-rotate", String.format("%s/rotate",pathbase))
-                .withLink("image-download", String.format("%s/file",pathbase))
-                .withLink("image-download-thumb", String.format("%s/file/thumb",pathbase))
+        response.withLink("imageRotate", String.format("%s/rotate",pathbase))
+                .withLink("imageDownload", String.format("%s/file",pathbase))
+                .withLink("imageDownloadThumb", String.format("%s/file/thumb",pathbase))
                 .withBean(image);
         return Response.ok(response.toString( RepresentationFactory.HAL_JSON)).build();
     }
@@ -83,7 +83,7 @@ public class ImagesResource {
     @Path("/{imageId}/file")
     @Produces("image/png")
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    @Relation(relation="image-download", method=METHOD_GET_IMAGE_FILE)
+    @Relation(relation="imageDownload", method=METHOD_GET_IMAGE_FILE)
     public Response getImageFile(@PathParam("imageId") String imageIdentifier) {
         try {
             storage.assertImageStatus(imageIdentifier, ImageStatus.READY);
@@ -101,7 +101,7 @@ public class ImagesResource {
     @GET
     @Path("/{imageId}/file/thumb")
     @Produces("image/png")
-    @Relation(relation="image-download-thumb",method=METHOD_GET_IMAGE_THUMB)
+    @Relation(relation="imageDownloadThumb",method=METHOD_GET_IMAGE_THUMB)
     public Response getImageThumb(@PathParam("imageId") String imageIdentifier) {
         try {
             storage.assertImageStatus(imageIdentifier, ImageStatus.READY);

@@ -1,7 +1,5 @@
 package au.com.twobit.yosane.service.resource;
 
-import io.dropwizard.assets.AssetsBundle;
-
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -12,8 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
-import org.eclipse.jetty.util.resource.FileResource;
 
 import au.com.twobit.yosane.service.resource.annotations.Relation;
 
