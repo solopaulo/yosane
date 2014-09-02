@@ -36,11 +36,11 @@ public class YosaneGuiceModule extends AbstractModule {
         configureHalBuilder();
         configureMiscellany();     
         configureYosaneSettings();
-//        install( new SaneDependencyModule() );
+        install( new SaneDependencyModule() );
         
-        MockSaneDependencyModule m = new MockSaneDependencyModule();
-        requestInjection(m);
-        install( m );
+//        MockSaneDependencyModule m = new MockSaneDependencyModule();
+//        requestInjection(m);
+//        install( m );
     }
 
     private void configureYosaneSettings() {
@@ -54,7 +54,7 @@ public class YosaneGuiceModule extends AbstractModule {
         bind(ArtifactCleanup.class).to(FileStorageArtifactCleanup.class);
         // set the default thumbnail scale length (width)
         requestStaticInjection(CreateThumbnail.class);
-        bind(Integer.class).annotatedWith(Names.named("scaleWidth")).toInstance(320);        
+        bind(Integer.class).annotatedWith(Names.named("scaleWidth")).toInstance(180);        
     }
 
     private void configureMiscellany() {

@@ -13,7 +13,6 @@ import au.com.twobit.yosane.api.ImageStatus;
 import au.com.twobit.yosane.api.comparator.ImageComparator;
 import au.com.twobit.yosane.service.image.ImageFormat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 public class FileStorageTest {
