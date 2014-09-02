@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import au.com.twobit.yosane.service.resource.ImagesResource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theoryinpractise.halbuilder.api.Link;
 
 public class MiscTest {
@@ -58,4 +59,9 @@ public class MiscTest {
         Assert.assertEquals(0,  Arrays.asList( new String [] { }).size());
     }
     
+    @Test
+    public void testJackson() {
+        ObjectMapper mapper = new ObjectMapper();
+        
+    }
 }

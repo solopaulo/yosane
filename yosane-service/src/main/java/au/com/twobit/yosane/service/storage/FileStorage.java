@@ -2,11 +2,15 @@ package au.com.twobit.yosane.service.storage;
 
 import static au.com.twobit.yosane.service.storage.FileStorage.PathFor.DOCUMENTS;
 import static au.com.twobit.yosane.service.storage.FileStorage.PathFor.IMAGES;
+import static com.theoryinpractise.halbuilder.api.RepresentationFactory.HAL_JSON;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -23,6 +27,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
+import com.theoryinpractise.halbuilder.api.ReadableRepresentation;
+import com.theoryinpractise.halbuilder.json.JsonRepresentationFactory;
 
 public class FileStorage implements Storage {
     private String holdingArea;
@@ -31,6 +38,8 @@ public class FileStorage implements Storage {
     private final static String IMAGE_FILE_NAME     =   "image";
     private final static String THUMB_FILE_NAME     =   "thumb";
     private final static String STATUS_FILE_NAME    =   "status";
+    private final static String DOCUMENT_BEAN       =   "document";
+    
     private ObjectMapper mapper;
     
     @Inject
@@ -168,7 +177,7 @@ public class FileStorage implements Storage {
      * @return - 
      */
     protected File getFileOf(PathFor pathFor, String identifier, String ... extras) throws StorageException {
-        File f = getPathFor(pathFor,identifier,false);
+        File f = getPathFor(pathFor,identifier,true);
         String [] params = Lists.asList(f.getPath(), extras != null ? extras : new String [] { }).toArray(new String[]{});
         String filepath = Joiner.on(File.separator).join(params);
         return new File(filepath);
