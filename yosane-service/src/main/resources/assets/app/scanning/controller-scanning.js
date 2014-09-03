@@ -2,14 +2,14 @@
  * 
  */
 var yosaneApp = angular.module('yosaneApp');
-yosaneApp.controller('ScanningController',['$scope','$http','yosaneServices',function($scope,$http,yosaneServices) {
+yosaneApp.controller('ScanningController',['$scope','$http','restful','imageService',function($scope,$http,restful,imageService) {
     $scope.selected = "";
     $scope.currentScanner = undefined;
     $scope.scannedImage = 'http://placehold.it/180x240';
     
     $scope.refreshScannerList = function() {
         $scope.currentScanner = undefined;
-        yosaneServices.get({},function(data) {
+        restful.get({},function(data) {
             $scope.items = data._links.scanner;
         }); 
     };
@@ -34,7 +34,6 @@ yosaneApp.controller('ScanningController',['$scope','$http','yosaneServices',fun
     };
     
     $scope.scanningProgress = function(response) {
-        console.log(response);
         var url = response._links.self.href;
         var status = response.status;
         console.log(status);
@@ -57,6 +56,7 @@ yosaneApp.controller('ScanningController',['$scope','$http','yosaneServices',fun
     $scope.updateCompletedImage = function(response) {
         $scope.scannedImage = response._links.imageDownloadThumb[0].href;
         $scope.$apply();
+        imageService.addImage(response);
         console.log(response);
     }
     

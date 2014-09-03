@@ -73,7 +73,7 @@
 		  <tab-heading><span class="glyphicon glyphicon-picture"></span> <span>Imgs</span></tab-heading>
 		  <ul>
                 <li ng-repeat="image in images">
-                    <img ng-src="{{image.src}}"/>
+                    <img ng-src="{{image._links.imageDownloadThumb[0].href}}"/>
                 </li>
           </ul>
 		</tab> 
