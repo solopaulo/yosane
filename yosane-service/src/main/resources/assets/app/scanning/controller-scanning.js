@@ -2,33 +2,46 @@
  * 
  */
 var yosaneApp = angular.module('yosaneApp');
-yosaneApp.controller('ScanningController',['$scope','$http','restful','imageService',function($scope,$http,restful,imageService) {
-    $scope.selected = "";
-    $scope.currentScanner = undefined;
-    $scope.scannedImage = 'http://placehold.it/180x240';
-    
+yosaneApp.controller('ScanningController',['$scope','$http','restful','imageService','scannerService',
+ function($scope,$http,restful,imageService,scannerService) {
+  
     $scope.refreshScannerList = function() {
-        $scope.currentScanner = undefined;
-        restful.get({},function(data) {
-            $scope.items = data._links.scanner;
+        scannerService.currentScanner = undefined;
+        restful.get({},function(data) {            
+            scannerService.scanners = data._links.scanner;            
         }); 
     };
+    
+    $scope.getScanners = function() {        
+        return scannerService.scanners;
+    };
+    
+    $scope.getScannedImage = function() {
+        return scannerService.scannedImage;
+    };
+    
+    $scope.getSelected = function() {
+        return scannerService.selected;
+    };
+    
     $scope.selectScanner = function(name) {
-        $scope.currentScanner = undefined;
-        for ( var i = 0; i < $scope.items.length; i++) {
-            if ( $scope.items[i].name != name ) {
+        scannerService.currentScanner = undefined;
+        for ( var i = 0; i < scannerService.scanners.length; i++) {
+            if ( scannerService.scanners[i].name != name ) {
                 continue;
             }
-            $scope.selected = name;
-            $scope.currentScanner = $scope.items[i];
-        }
+            scannerService.selected = name;
+            scannerService.currentScanner = scannerService.scanners[i];
+        }        
     };
-    $scope.refreshScannerList();
+    
     $scope.scan = function() {
-        if ( $scope.currentScanner === undefined ) {
+        if ( scannerService.currentScanner === undefined ) {
             return;
         }
-        $http.post($scope.currentScanner.href,[]).success( function(response) {
+        var murl = scannerService.currentScanner.href;
+        console.log(murl);
+        $http.post(murl,[]).success( function(response) {
             setTimeout( function() { $scope.scanningProgress( response ); },0);
         });
     };
@@ -54,13 +67,13 @@ yosaneApp.controller('ScanningController',['$scope','$http','restful','imageServ
     };
     
     $scope.updateCompletedImage = function(response) {
-        $scope.scannedImage = response._links.imageDownloadThumb[0].href;
+        scannerService.scannedImage = response._links.imageDownloadThumb[0].href;
         $scope.$apply();
         imageService.addImage(response);
         console.log(response);
     }
     
     $scope.discardImage = function() {
-      $scope.scannedImage = 'http://placehold.it/180x240';
+      scannerService.scannedImage = 'http://placehold.it/180x240';
     };
 }]);

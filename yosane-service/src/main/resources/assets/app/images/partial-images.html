@@ -1,0 +1,5 @@
+<ul>
+	<li class="thumbnail" ng-repeat="image in images"
+		title="{{$index + 1}}"><img
+		ng-src="{{image._links.imageDownloadThumb[0].href}}" /></li>
+</ul>

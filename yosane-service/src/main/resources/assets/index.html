@@ -7,83 +7,22 @@
 <link rel="stylesheet" href="/assets/css/bootstrap-theme.css">
 <link rel="stylesheet" href="/assets/app/yosane.css">
 <script src="/assets/app/bower_components/angular/angular.js"></script>
-<script
-	src="/assets/app/bower_components/angular-resource/angular-resource.js"></script>
-<script
-	src="/assets/app/bower_components/angular-route/angular-route.js"></script>
-<script
-	src="/assets/app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="/assets/app/bower_components/angular-resource/angular-resource.js"></script>
+<script src="/assets/app/bower_components/angular-route/angular-route.js"></script>
+<script src="/assets/app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 <script src="/assets/app/components/services.js"></script>
 <script src="/assets/app/app.js"></script>
 <script src="/assets/app/scanning/controller-scanning.js"></script>
 <script src="/assets/app/images/controller-images.js"></script>
-
+<script src="/assets/app/components/routes.js"></script>
 
 </head>
 <body>
-	<div class="row panel-footer col-lg-3 text-center">
-	<tabset class="text-left"> 
-		
-	<tab  ng-controller="ScanningController" ng-model="scanners">
-        <tab-heading><span class="glyphicon glyphicon-inbox"></span> <span>Scan</span></tab-heading>
-
-	   <div class="col-1">
-	       <a href="" class="thumbnail">
-	           <img class="media-object" ng-src="{{scannedImage}}" alt="...">
-	       </a>
-	    </div>
-		<div class="btn-group" dropdown>
-			<button ng-disabled="(!selected)" type="button" class="btn" ng-click="scan()" ng-class="(selected) ? 'btn-success' : 'btn-warning'">Scan</button>
-			<button type="button" class="btn dropdown-toggle" ng-class="(selected) ? 'btn-success' : 'btn-warning'">
-			 <span class="caret"></span> <span class="sr-only">Split button!</span>
-			</button>
-			
-			<ul class="dropdown-menu" role="menu">
-				<li ng-repeat="item in items">
-				    <a ng-click="selectScanner(item.name)" href="#"> with <strong>{{item.title}}</strong>
-						<span class="pull-right glyphicon glyphicon-ok"	style='margin-right: 0.4em;' ng-show="selected==item.name"></span>
-				    </a>
-				</li>
-				<li class="divider"></li>
-				<li style='width: 25em;'><a href="#" ng-click="refresh()"><em>Update Scanner List</em></a></li>
-			</ul>
-		</div>
-
-		<button ng-disabled="(scanned)" type="button" class="btn" ng-click="discardImage()">
-			<span class="glyphicon glyphicon-remove"></span> <span>Discard</span>
-		</button>
-
-
-		<div class="btn-group" dropdown>
-				<button type="button" class="btn dropdown-toggle">
-				<span class="glyphicon glyphicon-send"></span> <span>Send</span>
-				<span class="caret"></span> <span class="sr-only">Split	button!</span>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-				<li ng-repeat="item in items">
-				    <a ng-click="selectScanner(item.name)" href="#"> with <strong>{{item.title}}</strong>
-						<span class="pull-right glyphicon glyphicon-ok"	style='margin-right: 0.4em;' ng-show="selected==item.name"></span>
-				    </a>
-				</li>
-			</ul>
-		</div>
-
-		</tab> 
-		<tab ng-controller="ImagesController"> 
-		  <tab-heading><span class="glyphicon glyphicon-picture"></span> <span>Imgs</span></tab-heading>
-		  <ul>
-                <li ng-repeat="image in images">
-                    <img ng-src="{{image._links.imageDownloadThumb[0].href}}"/>
-                </li>
-          </ul>
-		</tab> 
-		
-		<tab>
-		  <tab-heading> <span class="glyphicon glyphicon-file"></span><span>Doc</span></tab-heading></tab>
-		  <tab> <tab-heading> <span	class="glyphicon glyphicon-cog"></span></tab-heading></tab> 
-	</tabset>
-	</div>
-
-
+ <div class="row panel-footer col-lg-3 text-center">
+  <ul class="nav-tabs nav" ng-controller="TabsController">
+   <li ng-click="setSelectedTab(tab)" ng-class="tabClass(tab)" ng-repeat="tab in tabs"><a href="{{tab.link}}"><span class="glyphicon {{tab.icon}}"></span> <span>{{tab.label}}</span></a></li>
+  </ul>
+  <div class="ng-view"></div>
+ </div>
 </body>
 </html>

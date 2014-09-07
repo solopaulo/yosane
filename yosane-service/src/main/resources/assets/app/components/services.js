@@ -21,3 +21,12 @@ yosaneServices.factory('imageService',[function() {
       }  
     };
 }]);
+
+yosaneServices.factory('scannerService',[function() {
+    return {
+        selected : "",
+        currentScanner : {},
+        scannedImage : 'http://placehold.it/180x240',
+        scanners : []
+    };
+}]);

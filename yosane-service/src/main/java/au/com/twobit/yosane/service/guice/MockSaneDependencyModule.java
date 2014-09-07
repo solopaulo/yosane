@@ -1,9 +1,13 @@
 package au.com.twobit.yosane.service.guice;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import au.com.twobit.yosane.api.Device;
@@ -17,6 +21,7 @@ import com.google.inject.AbstractModule;
 public class MockSaneDependencyModule extends AbstractModule {
     final List<Device>devices = Lists.newArrayList();
     private boolean done = false;
+    private int imageIndex = 0;
     
     @Inject
     private EncodeDecode coder;
@@ -63,8 +68,21 @@ public class MockSaneDependencyModule extends AbstractModule {
 
             @Override
             public BufferedImage acquireImage(String scanDeviceIdentifier, String ticket, DeviceOption... options) throws IllegalArgumentException, Exception {
-                // TODO Auto-generated method stub
-                return null;
+                BufferedImage img = null;
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception x) { }
+                try {
+                    File fileinput = null;
+                    Path path = Paths.get( getClass().getResource("/").toURI());
+                    File [] files = path.resolve("../../src/main/resources/mockimages").toFile().listFiles();
+                    fileinput = files[ imageIndex % files.length ];
+                    img = ImageIO.read(fileinput);
+                    imageIndex++;
+                } catch (Exception x) {
+                    x.printStackTrace();
+                }
+                return img;
             }
             
         };

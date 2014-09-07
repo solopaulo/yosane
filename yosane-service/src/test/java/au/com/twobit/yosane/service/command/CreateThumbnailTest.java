@@ -2,6 +2,8 @@ package au.com.twobit.yosane.service.command;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 
@@ -25,4 +27,10 @@ public class CreateThumbnailTest {
         Assert.assertTrue( result.exists() && result.canRead() && result.length() > 0);
     }
 
+    @Test
+    public void testSomePathStuff() throws Exception {
+        Path path = Paths.get( getClass().getResource("/").toURI());
+        File dir = path.resolve("../../src/main/resources/mockimages").toFile();
+        System.out.println( dir.isDirectory() && dir.exists());
+    }
 }

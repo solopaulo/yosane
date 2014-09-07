@@ -36,11 +36,11 @@ public class YosaneGuiceModule extends AbstractModule {
         configureHalBuilder();
         configureMiscellany();     
         configureYosaneSettings();
-        install( new SaneDependencyModule() );
+//        install( new SaneDependencyModule() );
         
-//        MockSaneDependencyModule m = new MockSaneDependencyModule();
-//        requestInjection(m);
-//        install( m );
+        MockSaneDependencyModule m = new MockSaneDependencyModule();
+        requestInjection(m);
+        install( m );
     }
 
     private void configureYosaneSettings() {
