@@ -8,7 +8,7 @@ var yosaneApp = angular.module('yosaneApp',[
     'ngRoute'
 ]);
 
-function TabsController($scope,imageService) {
+function TabsController($scope,$rootScope,imageService) {
     $scope.tabs = [
       { link : '#/scanning', label: 'Scan', icon: 'glyphicon-inbox'},
       { link : '#/images', label : 'Img', icon : 'glyphicon-picture'},
@@ -19,10 +19,8 @@ function TabsController($scope,imageService) {
     $scope.selectedTab = $scope.tabs[0];    
     $scope.setSelectedTab = function(tab) {
       $scope.selectedTab = tab;
-      if ( tab.label == 'Scan' ) {
-          $scope.$emit('hallo');
-      }
     };
+
     
     $scope.tabClass = function(tab) {
       if ($scope.selectedTab == tab) {
@@ -31,5 +29,10 @@ function TabsController($scope,imageService) {
         return "";
       }
     };
-        
+
+    
+    if ( $scope.selectedTab.label == 'Scan' ) {
+        setTimeout(function() {$rootScope.$broadcast('scanningTabSelected');},500);
+    }
+    
 };

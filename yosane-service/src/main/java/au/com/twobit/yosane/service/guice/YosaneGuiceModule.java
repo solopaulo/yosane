@@ -2,6 +2,10 @@ package au.com.twobit.yosane.service.guice;
 
 import java.util.concurrent.ExecutorService;
 
+import au.com.twobit.yosane.service.dw.YosaneServiceConfiguration;
+import au.com.twobit.yosane.service.email.EmailSettings;
+import au.com.twobit.yosane.service.email.SendEmail;
+import au.com.twobit.yosane.service.email.provider.SendEmailACE;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
 import au.com.twobit.yosane.service.storage.ArtifactCleanup;
@@ -22,9 +26,11 @@ import com.theoryinpractise.halbuilder.json.JsonRepresentationFactory;
 public class YosaneGuiceModule extends AbstractModule {
 
     final private ExecutorService executorService;
+    final private YosaneServiceConfiguration configuration;
     
-    public YosaneGuiceModule(ExecutorService executorService) {
+    public YosaneGuiceModule(ExecutorService executorService, YosaneServiceConfiguration configuration) {
         this.executorService = executorService;
+        this.configuration = configuration;
     }
 
     @Provides
@@ -36,6 +42,7 @@ public class YosaneGuiceModule extends AbstractModule {
         configureHalBuilder();
         configureMiscellany();     
         configureYosaneSettings();
+        configureEmail();
 //        install( new SaneDependencyModule() );
         
         MockSaneDependencyModule m = new MockSaneDependencyModule();
@@ -71,4 +78,8 @@ public class YosaneGuiceModule extends AbstractModule {
         bind(DefaultRepresentationFactory.class).toInstance( jsonFactory );        
    }
 
+   private void configureEmail() {
+       bind(EmailSettings.class).toInstance( configuration.getEmailSettings());
+       bind(SendEmail.class).to(SendEmailACE.class);
+   }
 }

@@ -4,12 +4,16 @@
 var yosaneApp = angular.module('yosaneApp');
 yosaneApp.controller('ScanningController',['$scope','$http','restful','imageService','scannerService',
  function($scope,$http,restful,imageService,scannerService) {
-  
+    $scope.$on('scanningTabSelected',function(event) {
+      $scope.refreshScannerList();  
+    });
+    
     $scope.refreshScannerList = function() {
         scannerService.currentScanner = undefined;
-        restful.get({},function(data) {            
+        restful.getScanners(function(data) {            
             scannerService.scanners = data._links.scanner;            
-        }); 
+        });
+        
     };
     
     $scope.getScanners = function() {        
@@ -39,9 +43,8 @@ yosaneApp.controller('ScanningController',['$scope','$http','restful','imageServ
         if ( scannerService.currentScanner === undefined ) {
             return;
         }
-        var murl = scannerService.currentScanner.href;
-        console.log(murl);
-        $http.post(murl,[]).success( function(response) {
+        
+        restful.scanImage({url:scannerService.currentScanner.href},function(response) {
             setTimeout( function() { $scope.scanningProgress( response ); },0);
         });
     };
@@ -70,10 +73,9 @@ yosaneApp.controller('ScanningController',['$scope','$http','restful','imageServ
         scannerService.scannedImage = response._links.imageDownloadThumb[0].href;
         $scope.$apply();
         imageService.addImage(response);
-        console.log(response);
     }
     
     $scope.discardImage = function() {
-      scannerService.scannedImage = 'http://placehold.it/180x240';
+      scannerService.scannedImage = scannerService.defaultImage;
     };
 }]);

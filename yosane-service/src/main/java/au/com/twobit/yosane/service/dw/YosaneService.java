@@ -35,16 +35,16 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         
     @Override
     public void initialize(Bootstrap<YosaneServiceConfiguration> configuration) {
-        configuration.addBundle( new AssetsBundle("/assets","/assets"));
+        configuration.addBundle( new AssetsBundle("/assets","/assets"));        
     }
 
     @Override
     public void run(YosaneServiceConfiguration configuration, Environment env) throws Exception {
         // setup an executor service
         ExecutorService executorService = env.lifecycle().executorService("async").maxThreads(3).build();
-        YosaneGuiceModule module = new YosaneGuiceModule(executorService);
-        
+        YosaneGuiceModule module = new YosaneGuiceModule(executorService, configuration);
         injector = Guice.createInjector(module);
+        
         // add resource for home
         env.jersey().register(injector.getInstance(HomeResource.class));
         // add resource for scanner

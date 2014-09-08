@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -32,6 +31,7 @@ import au.com.twobit.yosane.service.device.ScanHardware;
 import au.com.twobit.yosane.service.image.ImageUtils;
 import au.com.twobit.yosane.service.op.command.ScanImage;
 import au.com.twobit.yosane.service.resource.annotations.Relation;
+import au.com.twobit.yosane.service.resource.dto.ScanMessage;
 import au.com.twobit.yosane.service.storage.Storage;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
 import au.com.twobit.yosane.service.utils.TicketGenerator;
@@ -156,7 +156,7 @@ public class ScannersResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response acquireImage(@PathParam("scannerId") String scannerId, @Valid List<DeviceOption> options) {
+    public Response acquireImage(@PathParam("scannerId") String scannerId, ScanMessage scanMessage) {
         // create an image descriptor
         String iid = null;
         Image image = ImageUtils.createImageWithTicket( (iid = ticketGenerator.newTicket() ) );
@@ -169,7 +169,7 @@ public class ScannersResource {
         String scannerName = null;
         try {
             scannerName = coder.decodeString(scannerId);
-            executorService.execute(new ScanImage(hardware, storage, scannerName, iid,options));
+            executorService.execute(new ScanImage(hardware, storage, scannerName, iid,scanMessage.getDeviceOptions()));
             location = new URI(createLink(ir, METHOD_GET_IMAGE_DETAILS, iid).getHref());
         } catch (Exception x) {
             return ResourceHelper.generateErrorResponse(response, ERROR_SCANNER_ACQUIRE, x.getMessage());

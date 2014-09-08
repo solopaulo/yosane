@@ -5,9 +5,19 @@ var yosaneServices = angular.module('yosaneServices', ['ngResource']);
 
 yosaneServices.factory('restful', ['$resource',
   function($resource){
-    return $resource('/scanners', {}, {
-      query: {method:'GET', params:{}, isArray:false}
-    });    
+    return {
+        getScanners : function(callback) {
+            return $resource('/scanners', {}, {
+              query: {method:'GET', params:{}, isArray:false}
+            }).get({},callback);
+        },
+        scanImage : function(parameters,callback) {
+            var url = parameters.url;
+            return $resource(url, {}, {
+                fetch: {method:'POST',params: { deviceOptions: [] } }
+              }).fetch({},callback);
+        }
+    };
   }]);
 
 yosaneServices.factory('imageService',[function() {
@@ -26,7 +36,8 @@ yosaneServices.factory('scannerService',[function() {
     return {
         selected : "",
         currentScanner : {},
-        scannedImage : 'http://placehold.it/180x240',
+        defaultImage : '/assets/images/180x240.gif',
+        scannedImage : '/assets/images/180x240.gif',
         scanners : []
     };
 }]);

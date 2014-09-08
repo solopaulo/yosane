@@ -1,0 +1,10 @@
+emailSettings:
+ mailHost: somehost.com
+ mailPort: 25
+ mailUser: username
+ mailPassword: password
+ mailSubject: Here is your scanned image from Yosane
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
