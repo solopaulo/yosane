@@ -16,6 +16,11 @@ yosaneServices.factory('restful', ['$resource',
             return $resource(url, {}, {
                 fetch: {method:'POST',params: { deviceOptions: [] } }
               }).fetch({},callback);
+        },
+        emailImage : function() {
+            return $resource('/email/image',{}, {
+               send : { method:'POST' }
+            });
         }
     };
   }]);
@@ -38,6 +43,7 @@ yosaneServices.factory('scannerService',[function() {
         currentScanner : {},
         defaultImage : '/assets/images/180x240.gif',
         scannedImage : '/assets/images/180x240.gif',
-        scanners : []
+        scanners : [],
+        status : ""
     };
 }]);

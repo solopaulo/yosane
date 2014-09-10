@@ -2,3 +2,15 @@
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 body { padding:1em;}
 .textleft { text-align:left !important;}
+.ng-view {
+	min-height:400px;
+	padding-pottom:2em;
+}
+.position-from-right {
+    position:relative;	
+}
+
+.position-from-right .dropdown-menu {
+	left: auto !important;
+	right:0;
+}
