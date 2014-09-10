@@ -7,6 +7,7 @@ public class EmailSettings {
     private String mailUser;
     private String mailPassword;
     private String mailSubject;
+    private boolean startTls = false;
     
     public String getMailSubject() {
         return mailSubject;
@@ -43,5 +44,11 @@ public class EmailSettings {
     }
     public void setMailPassword(String mailPassword) {
         this.mailPassword = mailPassword;
+    }
+    public boolean isStartTls() {
+        return startTls;
+    }
+    public void setStartTls(boolean startTls) {
+        this.startTls = startTls;
     }
 }

@@ -17,6 +17,7 @@ import org.joda.time.Period;
 import au.com.twobit.yosane.service.dw.healthcheck.ScannersAvailable;
 import au.com.twobit.yosane.service.guice.YosaneGuiceModule;
 import au.com.twobit.yosane.service.resource.DocumentsResource;
+import au.com.twobit.yosane.service.resource.EmailsResource;
 import au.com.twobit.yosane.service.resource.HomeResource;
 import au.com.twobit.yosane.service.resource.ImagesResource;
 import au.com.twobit.yosane.service.resource.ScannersResource;
@@ -53,6 +54,8 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         env.jersey().register(injector.getInstance(ImagesResource.class));
         // add resource for document
         env.jersey().register(injector.getInstance(DocumentsResource.class));
+        // add resource for emails
+        env.jersey().register(injector.getInstance(EmailsResource.class));
         // add health check
         env.healthChecks().register("Scanner Availability", injector.getInstance(ScannersAvailable.class));
         // add a timer to run the artifact cleanup

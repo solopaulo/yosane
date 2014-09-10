@@ -3,6 +3,7 @@ package au.com.twobit.yosane.service.email.provider;
 import java.io.File;
 
 import javax.inject.Inject;
+import javax.mail.internet.InternetAddress;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.mail.EmailAttachment;
@@ -13,6 +14,7 @@ import au.com.twobit.yosane.service.email.SendEmail;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 public class SendEmailACE implements SendEmail {
 
@@ -35,6 +37,7 @@ public class SendEmailACE implements SendEmail {
         MultiPartEmail email = null;
         try {
             email = transformEmailSettingsToMultiPartEmail(emailSettings);
+            email.setTo( Lists.newArrayList( InternetAddress.parse(recipient)));
             for (File input : files) {
                 EmailAttachment attachment = transformFileToEmailAttachment(input);
                 if (attachment == null) {
@@ -62,7 +65,7 @@ public class SendEmailACE implements SendEmail {
         return attachment;
     }
 
-    protected MultiPartEmail transformEmailSettingsToMultiPartEmail(EmailSettings emailSettings) {
+    protected MultiPartEmail transformEmailSettingsToMultiPartEmail(EmailSettings emailSettings) throws Exception {
         // create a new multi part email
         MultiPartEmail email = new MultiPartEmail();
         // set the hostname
@@ -83,7 +86,10 @@ public class SendEmailACE implements SendEmail {
             // only override smtp port if it was specified
             email.setSmtpPort(emailSettings.getMailPort());
         }
+        email.setStartTLSEnabled( Boolean.valueOf( emailSettings.isStartTls()));
+        email.setStartTLSRequired( email.isStartTLSEnabled());
         email.setSubject(Optional.fromNullable(emailSettings.getMailSubject()).or(DEFAULT_SUBJECT));
+        email.setFrom("paul@iove.org", "Yosane Scanner Emails");
         return email;
     }
 }
