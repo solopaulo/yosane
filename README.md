@@ -1,9 +1,12 @@
 yosane
 ======
 
-restful API to image scanning devices, using net-SANE
+#### Mobile Web client and restful API to image scanning devices, using net-SANE
+* Angular.js
+* Twitter Bootstrap 3
+* Dropwizard
 
-=====
+### May 2014
 
 This is just another itch scratcher project. At home we have a multi-function
 printer/scanner hooked up to a Linux PVR, so that it can be shared over the 
