@@ -2,6 +2,7 @@
 <html ng-app="yosaneApp" lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yosane</title>
 <link rel="stylesheet" href="/assets/css/bootstrap-3.1.1.min.css">
 <link rel="stylesheet" href="/assets/css/bootstrap-theme.css">
@@ -20,11 +21,21 @@
 
 </head>
 <body>
- <div class="row panel-footer col-lg-3 text-center">
-  <ul class="nav-tabs nav" ng-controller="TabsController">
-   <li ng-click="setSelectedTab(tab)" ng-class="tabClass(tab)" ng-repeat="tab in tabs"><a href="{{tab.link}}"><span class="glyphicon {{tab.icon}}"></span> <span>{{tab.label}}</span></a></li>
-  </ul>
-  <div class="ng-view"></div>
- </div>
+
+ <div class="container">
+ 
+  <div class="row text-center no-gutter">
+   <div class="col-md-4 xs-hidden"></div>
+   <div class="col-xs-12 col-md-4 panel-footer">
+    <ul class="nav-tabs nav" ng-controller="TabsController">
+     <li ng-click="setSelectedTab(tab)" ng-class="tabClass(tab)" ng-repeat="tab in tabs"><a href="{{tab.link}}"><span
+       class="glyphicon {{tab.icon}}"></span> <span>{{tab.label}}</span></a></li>
+    </ul>
+    <div class="ng-view"></div>
+   </div>
+   
+   <div class="col-md-4 xs-hidden"></div>
+  </div>
+  
 </body>
 </html>

@@ -2,53 +2,76 @@ package au.com.twobit.yosane.service.email;
 
 public class EmailSettings {
     private boolean sslEnabled = false;
-    private String mailHost;
-    private int mailPort = -1;
-    private String mailUser;
-    private String mailPassword;
-    private String mailSubject;
+    private String smtpHost;
+    private int smtpPort = -1;
+    private String username;
+    private String password;
+    private String defaultSubject = "Here is your scanned image from Yosane";
+    private String defaultSender = "me@privacy.net";
+    private String defaultSenderName = "Yosane Scanner Emails";
+    private String defaultRecipient;
     private boolean startTls = false;
     
-    public String getMailSubject() {
-        return mailSubject;
+    public String getDefaultSubject() {
+        return defaultSubject;
     }
-    public void setMailSubject(String mailSubject) {
-        this.mailSubject = mailSubject;
+    
+    public void setDefaultSubject(String defaultSubject) {
+        this.defaultSubject = defaultSubject;
     }
+    
     public boolean isSslEnabled() {
         return sslEnabled;
     }
     public void setSslEnabled(boolean useSSL) {
         this.sslEnabled = useSSL;
     }
-    public String getMailHost() {
-        return mailHost;
+    public String getSmtpHost() {
+        return smtpHost;
     }
-    public void setMailHost(String mailHost) {
-        this.mailHost = mailHost;
+    public void setSmtpHost(String mailHost) {
+        this.smtpHost = mailHost;
     }
-    public int getMailPort() {
-        return mailPort;
+    public int getSmtpPort() {
+        return smtpPort;
     }
-    public void setMailPort(int mailPort) {
-        this.mailPort = mailPort;
+    public void setSmtpPort(int mailPort) {
+        this.smtpPort = mailPort;
     }
-    public String getMailUser() {
-        return mailUser;
+    public String getUsername() {
+        return username;
     }
-    public void setMailUser(String mailUser) {
-        this.mailUser = mailUser;
+    public void setUsername(String mailUser) {
+        this.username = mailUser;
     }
-    public String getMailPassword() {
-        return mailPassword;
+    public String getPassword() {
+        return password;
     }
-    public void setMailPassword(String mailPassword) {
-        this.mailPassword = mailPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
     public boolean isStartTls() {
         return startTls;
     }
     public void setStartTls(boolean startTls) {
         this.startTls = startTls;
+    }
+    public String getDefaultRecipient() {
+        return defaultRecipient;
+    }
+    public void setDefaultRecipient(String defaultRecipient) {
+        this.defaultRecipient = defaultRecipient;
+    }
+    public String getDefaultSender() {
+        return defaultSender;
+    }
+    public void setDefaultSender(String defaultSender) {
+        this.defaultSender = defaultSender;
+    }
+    public String getDefaultSenderName() {
+        return defaultSenderName;
+    }
+    public void setDefaultSenderName(String defaultSenderName) {
+        this.defaultSenderName = defaultSenderName;
     }
 }

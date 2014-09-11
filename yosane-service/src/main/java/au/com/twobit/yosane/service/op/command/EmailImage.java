@@ -2,8 +2,6 @@ package au.com.twobit.yosane.service.op.command;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -15,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import au.com.twobit.yosane.service.email.SendEmail;
 import au.com.twobit.yosane.service.resource.dto.EmailMessage;
 import au.com.twobit.yosane.service.storage.Storage;
+
+import com.google.common.base.Optional;
 
 public class EmailImage implements Runnable {
 

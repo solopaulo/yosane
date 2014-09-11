@@ -120,7 +120,7 @@ yosaneApp.controller('ScanningController',
             console.log("failed to send email");
             return;
         } 
-        restful.emailImage().send({},{recipient:'paul@iove.org',imageIdentifier:images[0].identifier},
+        restful.emailImage().send({},{imageIdentifier:images[0].identifier},
                 function(resp) {
                     console.log('email accepted');
                     console.log(resp);

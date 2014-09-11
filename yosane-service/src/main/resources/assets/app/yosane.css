@@ -14,3 +14,8 @@ body { padding:1em;}
 	left: auto !important;
 	right:0;
 }
+
+.no-gutter .col-xs-12 {
+	padding-left:0 ;
+	padding-right:0;
+}

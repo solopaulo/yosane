@@ -11,12 +11,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import au.com.twobit.yosane.service.op.command.EmailImage;
+import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.resource.dto.EmailMessage;
 import au.com.twobit.yosane.service.storage.Storage;
 
 import com.google.common.base.Strings;
 
 @Path("/email")
+@Relation(relation="emails")
 public class EmailsResource {
     private ExecutorService executorService;
     private EmailImage emailImage;
@@ -31,10 +33,8 @@ public class EmailsResource {
     @Path("/image")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendTestEmail(EmailMessage emailMessage) {
-        if ( emailMessage == null || 
-             Strings.isNullOrEmpty( emailMessage.getRecipient() ) ||
-             Strings.isNullOrEmpty( emailMessage.getImageIdentifier() )) {
+    public Response sendImageEmail(EmailMessage emailMessage) {
+        if ( emailMessage == null || Strings.isNullOrEmpty( emailMessage.getImageIdentifier() )) {
             return Response.serverError().entity("That is bad").build();
         }        
         executorService.execute(emailImage.send( emailMessage ) );

@@ -1,9 +1,12 @@
 emailSettings:
- mailHost: somehost.com
- mailPort: 25
- mailUser: username
- mailPassword: password
- mailSubject: Here is your scanned image from Yosane
+ smtpHost: somehost.com
+ smtpPort: 25
+ username: username
+ password: password
+ defaultSubject: Here is your scanned image from Yosane
+ defaultRecipient: me@privacy.net
+ defaultSender: me@privacy.net
+ defaultSenderName: Yosane Scanner Emails
 server:
   applicationConnectors:
     - type: http

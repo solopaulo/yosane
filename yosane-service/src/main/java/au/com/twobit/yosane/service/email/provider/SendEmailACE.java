@@ -27,25 +27,24 @@ public class SendEmailACE implements SendEmail {
     }
 
     @Override
-    public void sendImagesTo(String recipient, File... files) throws Exception {
+    public void sendImagesTo(String sendTo, File... files) throws Exception {
         if (emailSettings == null) {
             throw new Exception("Email is not configured");
         } else if (files == null) {
             throw new Exception("There are no files to be attached");
+        }
+        
+        // determine a recipient
+        String recipient = Optional.fromNullable( sendTo ).or( emailSettings.getDefaultRecipient() );
+        if ( Strings.isNullOrEmpty( recipient ) ) {
+            throw new Exception("No recipient specified and no suitable default recipient is found");
         }
 
         MultiPartEmail email = null;
         try {
             email = transformEmailSettingsToMultiPartEmail(emailSettings);
             email.setTo( Lists.newArrayList( InternetAddress.parse(recipient)));
-            for (File input : files) {
-                EmailAttachment attachment = transformFileToEmailAttachment(input);
-                if (attachment == null) {
-                    // log an error
-                    continue;
-                }
-                email.attach(attachment);
-            }
+            applyFilesToEmailAsAttachments(email, files);
         } catch (Exception x) {
             throw new Exception("Failed configuring the email: " + x.getMessage());
         }
@@ -53,6 +52,17 @@ public class SendEmailACE implements SendEmail {
         email.send();
     }
 
+    protected void applyFilesToEmailAsAttachments(MultiPartEmail email, File ...files) throws Exception {
+        for (File input : files) {
+            EmailAttachment attachment = transformFileToEmailAttachment(input);
+            if (attachment == null) {
+                // log an error
+                continue;
+            }
+            email.attach(attachment);
+        }
+    }
+    
     protected EmailAttachment transformFileToEmailAttachment(File input) {
         if (input == null || !input.exists()) {
             return null;
@@ -69,27 +79,27 @@ public class SendEmailACE implements SendEmail {
         // create a new multi part email
         MultiPartEmail email = new MultiPartEmail();
         // set the hostname
-        email.setHostName(emailSettings.getMailHost().toLowerCase());
+        email.setHostName(emailSettings.getSmtpHost().toLowerCase());
         // if the username is set in the mail settings, then perhaps
         // authentication is required
-        if (!Strings.isNullOrEmpty(emailSettings.getMailUser())) {
-            email.setAuthentication(emailSettings.getMailUser(), Optional.fromNullable(emailSettings.getMailPassword()).or(""));
+        if (!Strings.isNullOrEmpty(emailSettings.getUsername())) {
+            email.setAuthentication(emailSettings.getUsername(), Optional.fromNullable(emailSettings.getPassword()).or(""));
         }
         // if SSL is enabled, then set it so
         if (emailSettings.isSslEnabled()) {
             email.setSSLOnConnect(true);
-            if (emailSettings.getMailPort() >= 0) {
+            if (emailSettings.getSmtpPort() >= 0) {
                 // only override ssl port if it was specified
-                email.setSslSmtpPort(String.valueOf(emailSettings.getMailPort()));
+                email.setSslSmtpPort(String.valueOf(emailSettings.getSmtpPort()));
             }
-        } else if (emailSettings.getMailPort() >= 0) {
+        } else if (emailSettings.getSmtpPort() >= 0) {
             // only override smtp port if it was specified
-            email.setSmtpPort(emailSettings.getMailPort());
+            email.setSmtpPort(emailSettings.getSmtpPort());
         }
         email.setStartTLSEnabled( Boolean.valueOf( emailSettings.isStartTls()));
         email.setStartTLSRequired( email.isStartTLSEnabled());
-        email.setSubject(Optional.fromNullable(emailSettings.getMailSubject()).or(DEFAULT_SUBJECT));
-        email.setFrom("paul@iove.org", "Yosane Scanner Emails");
+        email.setSubject(Optional.fromNullable(emailSettings.getDefaultSubject()).or(DEFAULT_SUBJECT));
+        email.setFrom(emailSettings.getDefaultSender(),emailSettings.getDefaultSenderName());
         return email;
     }
 }

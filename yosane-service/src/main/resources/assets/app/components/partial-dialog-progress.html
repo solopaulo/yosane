@@ -1,11 +1,9 @@
 <div class="modal-header">
  <h3 class="modal-title">{{ getSelectedScanner().title }}</h3>
 </div>
-<div class="modal-body">
-    <progressbar class="progress-striped active" value="100">
-    </progressbar>
-    <div class="alert alert-warning"><h3>{{getStatus()}}</h3></div>
-    
+<div class="modal-body" style='margin-bottom:0;padding-bottom:0;'>
+    <progressbar class="progress-striped active warning" value="100"><p class="large">{{getStatus()}}</p>
+    </progressbar>    
 </div>
 <div class="modal-footer">
  <button class="btn btn-warning" ng-click="alert('arr')">Cancel</button>
