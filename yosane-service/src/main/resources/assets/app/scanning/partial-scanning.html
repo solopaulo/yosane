@@ -13,9 +13,13 @@
   </button>
 
   <ul class="dropdown-menu" role="menu">
-   <li ng-repeat="scanner in getScanners()" ng-click="selectScanner(scanner.name)" class="textleft"><a href="#"> with <strong>{{scanner.title}}</strong>
-     <span class="pull-right glyphicon glyphicon-ok" style='margin-right: 0.4em;' ng-show="getSelectedScannerName()==scanner.name"></span>
-   </a></li>
+   <li ng-repeat="scanner in getScanners()" ng-click="selectScanner(scanner.name)" class="textleft">
+    <a href="#">
+        <span ng-show="scanner.name">with</span> <strong>{{scanner.title}}</strong>
+        <span class="pull-right glyphicon glyphicon-ok" style='margin-right: 0.4em;' 
+            ng-show="scanner.name && getSelectedScannerName()==scanner.name"></span>
+    </a>
+   </li>
    <li class="divider"></li>
    <li style='width: 25em;'><a ng-click="refreshScannerList()" href="#"><em>Update Scanner List</em></a></li>
   </ul>

@@ -6,16 +6,16 @@ var yosaneServices = angular.module('yosaneServices', ['ngResource']);
 yosaneServices.factory('restful', ['$resource',
   function($resource){
     return {
-        getScanners : function(callback) {
+        getScanners : function(cb,errcb) {
             return $resource('/scanners', {}, {
               query: {method:'GET', params:{}, isArray:false}
-            }).get({},callback);
+            }).get({},cb, errcb);
         },
-        scanImage : function(parameters,callback) {
+        scanImage : function(parameters,cb,errcb) {
             var url = parameters.url;
             return $resource(url, {}, {
                 fetch: {method:'POST',params: { deviceOptions: [] } }
-              }).fetch({},callback);
+              }).fetch({},cb,errcb);
         },
         emailImage : function() {
             return $resource('/email/image',{}, {
@@ -44,6 +44,7 @@ yosaneServices.factory('scannerService',[function() {
         defaultImage : '/assets/images/180x240.gif',
         scannedImage : '/assets/images/180x240.gif',
         scanners : [],
-        status : ""
+        status : "",
+        emptyScannerList : [ { name : "", title : "No scanners available"}]
     };
 }]);

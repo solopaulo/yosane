@@ -14,8 +14,12 @@ yosaneApp.controller('ScanningController',
     /** Refresh the list of scanners */
     $scope.refreshScannerList = function() {
         scannerService.currentScanner = undefined;
-        restful.getScanners(function(data) {            
+        restful.getScanners(function(data) {   
             scannerService.scanners = data._links.scanner;            
+        }, function(r) {
+            scannerService.scanners = scannerService.emptyScannerList;
+            scannerService.selected = name;
+            scannerService.currentScanner = undefined;
         });
     };
    
@@ -65,6 +69,8 @@ yosaneApp.controller('ScanningController',
                 templateUrl:'/assets/app/components/partial-dialog-progress.html',
                 scope:$scope
             });
+        }, function(r) {
+            $scope.refreshScannerList();
         });
     };
     
