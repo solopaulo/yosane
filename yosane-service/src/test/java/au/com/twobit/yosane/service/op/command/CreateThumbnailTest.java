@@ -1,4 +1,4 @@
-package au.com.twobit.yosane.service.command;
+package au.com.twobit.yosane.service.op.command;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,14 +17,21 @@ public class CreateThumbnailTest {
 
     @Test
     public void testResize() throws Exception {
-        File result = new File("/tmp/yosane/test.thumbnail.png");
-        if ( result.exists() && result.canWrite() ) {
-            result.delete();
-        }
-        BufferedImage input = ImageIO.read( new File("/tmp/yosane/test.png"));
-        BufferedImage output = new CreateThumbnail(input).call();
+        File fileInput = null;
+        try {
+            Path path = Paths.get( getClass().getResource("/").toURI());
+            fileInput = path.resolve("../../src/main/resources/mockimages/DSC05828.JPG").toFile();
+        } catch (Exception x) {
+            Assert.fail(x.getMessage());
+        }        
+        BufferedImage input = ImageIO.read( fileInput );
+        CreateThumbnail creator = new CreateThumbnail(input);
+        CreateThumbnail.setScaleWidth(350);
+        BufferedImage output = creator.call();
+        File result = File.createTempFile("prefix","suffix");
         ImageIO.write(output, ImageFormat.png.name(), result);
         Assert.assertTrue( result.exists() && result.canRead() && result.length() > 0);
+        Assert.assertTrue( result.delete() );
     }
 
     @Test
