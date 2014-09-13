@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import au.com.southsky.jfreesane.OptionValueConstraintType;
 import au.com.southsky.jfreesane.OptionValueType;
 import au.com.southsky.jfreesane.SaneOption;
 import au.com.twobit.yosane.api.DeviceOption;
@@ -35,7 +36,7 @@ public class TransformSaneOptionToDeviceOptionTest {
         Mockito.when(so.getDescription()).thenReturn(OPT_DESC);
         Mockito.when(so.getTitle()).thenReturn(OPT_TITLE);
         Mockito.when(so.getType()).thenReturn(OptionValueType.STRING);
-        
+        Mockito.when( so.getConstraintType()).thenReturn( OptionValueConstraintType.NO_CONSTRAINT) ;
         DeviceOption dopt = transform.apply(so);
         Assert.assertNotNull(dopt);
         Assert.assertEquals(OPT_NAME, dopt.getName());

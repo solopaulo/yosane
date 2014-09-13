@@ -36,6 +36,7 @@ public class TransformSaneDeviceToDeviceTest {
     
     @Test
     public void testNormalTransformation() {
+        transform.setCoder( coder );
         SaneDevice device = mock(SaneDevice.class);
         when(device.getModel()).thenReturn(DEV_MODEL);
         when(device.getName()).thenReturn(DEV_NAME);
