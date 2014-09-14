@@ -2,12 +2,12 @@ package au.com.twobit.yosane.service.guice;
 
 import java.util.concurrent.ExecutorService;
 
+import au.com.twobit.yosane.service.dw.EmailConfiguration;
 import au.com.twobit.yosane.service.dw.YosaneServiceConfiguration;
-import au.com.twobit.yosane.service.email.EmailSettings;
-import au.com.twobit.yosane.service.email.SendEmail;
-import au.com.twobit.yosane.service.email.provider.SendEmailACE;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
+import au.com.twobit.yosane.service.send.SendFiles;
+import au.com.twobit.yosane.service.send.provider.SendFilesEmailACE;
 import au.com.twobit.yosane.service.storage.ArtifactCleanup;
 import au.com.twobit.yosane.service.storage.FileStorage;
 import au.com.twobit.yosane.service.storage.FileStorageArtifactCleanup;
@@ -79,7 +79,7 @@ public class YosaneGuiceModule extends AbstractModule {
    }
 
    private void configureEmail() {
-       bind(EmailSettings.class).toInstance( configuration.getEmailSettings());
-       bind(SendEmail.class).to(SendEmailACE.class);
+       bind(EmailConfiguration.class).toInstance( configuration.getEmailConfiguration());
+       bind(SendFiles.class).to(SendFilesEmailACE.class);
    }
 }

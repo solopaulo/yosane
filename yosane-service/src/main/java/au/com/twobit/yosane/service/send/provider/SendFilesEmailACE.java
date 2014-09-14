@@ -1,6 +1,7 @@
-package au.com.twobit.yosane.service.email.provider;
+package au.com.twobit.yosane.service.send.provider;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.mail.internet.InternetAddress;
@@ -9,40 +10,39 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.MultiPartEmail;
 
-import au.com.twobit.yosane.service.email.EmailSettings;
-import au.com.twobit.yosane.service.email.SendEmail;
+import au.com.twobit.yosane.service.dw.EmailConfiguration;
+import au.com.twobit.yosane.service.send.SendFiles;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-public class SendEmailACE implements SendEmail {
+public class SendFilesEmailACE  implements SendFilesEmail  {
 
-    private EmailSettings emailSettings;
-    public static final String DEFAULT_SUBJECT = "Here is your image from Yosane, the email";
+    private EmailConfiguration emailConfiguration;
 
     @Inject
-    public SendEmailACE(@NotNull EmailSettings emailSettings) {
-        this.emailSettings = emailSettings;
+    public SendFilesEmailACE(@NotNull EmailConfiguration emailSettings) {
+        this.emailConfiguration = emailSettings;
     }
 
     @Override
-    public void sendImagesTo(String sendTo, File... files) throws Exception {
-        if (emailSettings == null) {
+    public void sendFilesTo(Map<String, String> settings, File... files) throws Exception {
+        if (emailConfiguration == null) {
             throw new Exception("Email is not configured");
         } else if (files == null) {
             throw new Exception("There are no files to be attached");
         }
         
         // determine a recipient
-        String recipient = Optional.fromNullable( sendTo ).or( emailSettings.getDefaultRecipient() );
+        String recipient = Optional.fromNullable( settings.get(RECIPIENT) ).or( emailConfiguration.getDefaultRecipient() );
         if ( Strings.isNullOrEmpty( recipient ) ) {
             throw new Exception("No recipient specified and no suitable default recipient is found");
         }
 
         MultiPartEmail email = null;
         try {
-            email = transformEmailSettingsToMultiPartEmail(emailSettings);
+            email = transformEmailSettingsToMultiPartEmail(emailConfiguration);
             email.setTo( Lists.newArrayList( InternetAddress.parse(recipient)));
             applyFilesToEmailAsAttachments(email, files);
         } catch (Exception x) {
@@ -75,31 +75,36 @@ public class SendEmailACE implements SendEmail {
         return attachment;
     }
 
-    protected MultiPartEmail transformEmailSettingsToMultiPartEmail(EmailSettings emailSettings) throws Exception {
+    protected MultiPartEmail transformEmailSettingsToMultiPartEmail(EmailConfiguration emailConfiguration) throws Exception {
         // create a new multi part email
         MultiPartEmail email = new MultiPartEmail();
         // set the hostname
-        email.setHostName(emailSettings.getSmtpHost().toLowerCase());
+        email.setHostName(emailConfiguration.getSmtpHost().toLowerCase());
         // if the username is set in the mail settings, then perhaps
         // authentication is required
-        if (!Strings.isNullOrEmpty(emailSettings.getUsername())) {
-            email.setAuthentication(emailSettings.getUsername(), Optional.fromNullable(emailSettings.getPassword()).or(""));
+        if (!Strings.isNullOrEmpty(emailConfiguration.getUsername())) {
+            email.setAuthentication(emailConfiguration.getUsername(), Optional.fromNullable(emailConfiguration.getPassword()).or(""));
         }
         // if SSL is enabled, then set it so
-        if (emailSettings.isSslEnabled()) {
+        if (emailConfiguration.isSslEnabled()) {
             email.setSSLOnConnect(true);
-            if (emailSettings.getSmtpPort() >= 0) {
+            if (emailConfiguration.getSmtpPort() >= 0) {
                 // only override ssl port if it was specified
-                email.setSslSmtpPort(String.valueOf(emailSettings.getSmtpPort()));
+                email.setSslSmtpPort(String.valueOf(emailConfiguration.getSmtpPort()));
             }
-        } else if (emailSettings.getSmtpPort() >= 0) {
+        } else if (emailConfiguration.getSmtpPort() >= 0) {
             // only override smtp port if it was specified
-            email.setSmtpPort(emailSettings.getSmtpPort());
+            email.setSmtpPort(emailConfiguration.getSmtpPort());
         }
-        email.setStartTLSEnabled( Boolean.valueOf( emailSettings.isStartTls()));
+        email.setStartTLSEnabled( Boolean.valueOf( emailConfiguration.isStartTls()));
         email.setStartTLSRequired( email.isStartTLSEnabled());
-        email.setSubject(Optional.fromNullable(emailSettings.getDefaultSubject()).or(DEFAULT_SUBJECT));
-        email.setFrom(emailSettings.getDefaultSender(),emailSettings.getDefaultSenderName());
+        email.setSubject(Optional.fromNullable(emailConfiguration.getDefaultSubject()).or(DEFAULT_SUBJECT));
+        email.setFrom(emailConfiguration.getDefaultSender(),emailConfiguration.getDefaultSenderName());
         return email;
+    }
+
+    @Override
+    public String getDestinationDescription() {
+        return "Send via Email";
     }
 }

@@ -1,4 +1,4 @@
-emailSettings:
+emailConfiguration:
  smtpHost: somehost.com
  smtpPort: 25
  username: username

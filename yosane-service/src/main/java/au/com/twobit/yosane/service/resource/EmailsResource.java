@@ -15,8 +15,6 @@ import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.resource.dto.EmailMessage;
 import au.com.twobit.yosane.service.storage.Storage;
 
-import com.google.common.base.Strings;
-
 @Path("/email")
 @Relation(relation="emails")
 public class EmailsResource {
@@ -34,7 +32,9 @@ public class EmailsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendImageEmail(EmailMessage emailMessage) {
-        if ( emailMessage == null || Strings.isNullOrEmpty( emailMessage.getImageIdentifier() )) {
+        if ( emailMessage == null || 
+                emailMessage.getImageIdentifiers() == null ||
+                emailMessage.getImageIdentifiers().length == 0 ) {
             return Response.serverError().entity("That is bad").build();
         }        
         executorService.execute(emailImage.send( emailMessage ) );

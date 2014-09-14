@@ -3,7 +3,7 @@ package au.com.twobit.yosane.service.resource.dto;
 public class EmailMessage {
     private String recipient;
     private String subject;
-    private String imageIdentifier;
+    private String [] imageIdentifiers;
 
     public String getRecipient() {
         return recipient;
@@ -13,12 +13,12 @@ public class EmailMessage {
         this.recipient = recipient;
     }
     
-    public String getImageIdentifier() {
-        return imageIdentifier;
+    public String [] getImageIdentifiers() {
+        return imageIdentifiers;
     }
     
-    public void setImageIdentifier(String imageIdentifier) {
-        this.imageIdentifier = imageIdentifier;
+    public void setImageIdentifiers(String [] imageIdentifiers) {
+        this.imageIdentifiers = imageIdentifiers;
     }
     
     public String getSubject() {

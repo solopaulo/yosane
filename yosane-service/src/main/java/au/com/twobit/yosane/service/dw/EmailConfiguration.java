@@ -1,6 +1,6 @@
-package au.com.twobit.yosane.service.email;
+package au.com.twobit.yosane.service.dw;
 
-public class EmailSettings {
+public class EmailConfiguration {
     private boolean sslEnabled = false;
     private String smtpHost;
     private int smtpPort = -1;
