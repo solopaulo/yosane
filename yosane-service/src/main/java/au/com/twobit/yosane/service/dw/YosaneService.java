@@ -5,9 +5,8 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import java.io.File;
-import java.net.URI;
-import java.nio.charset.Charset;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +22,6 @@ import au.com.twobit.yosane.service.resource.ImagesResource;
 import au.com.twobit.yosane.service.resource.ScannersResource;
 import au.com.twobit.yosane.service.storage.ArtifactCleanup;
 
-import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -72,8 +70,12 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
 
     public static void main(String[] args) {
         try {
-            File banner = new File(new URI(YosaneService.class.getResource("/banner.txt").toString()));
-            System.out.println(Files.toString(banner, Charset.defaultCharset()));
+            BufferedReader reader = new BufferedReader( new InputStreamReader( YosaneService.class.getResource("/banner.txt").openStream() ));
+            String line = null;
+            while ((line = reader.readLine()) != null ) {
+                System.out.println(line);
+            }
+            reader.close();
             new YosaneService().run(args);
         } catch (Exception x) {
             System.err.println(String.format("Abnormal exit: %s", x.getMessage()));

@@ -5,6 +5,7 @@ import io.dropwizard.Configuration;
 
 public class YosaneServiceConfiguration extends Configuration {
     private EmailConfiguration emailConfiguration;
+    private LocalDirectoryConfiguration localDirectoryConfiguration;
     
     public YosaneServiceConfiguration() {
     }
@@ -15,6 +16,14 @@ public class YosaneServiceConfiguration extends Configuration {
     
     public EmailConfiguration getEmailConfiguration() {
         return emailConfiguration;
+    }
+
+    public LocalDirectoryConfiguration getLocalDirectoryConfiguration() {
+        return localDirectoryConfiguration;
+    }
+
+    public void setLocalDirectoryConfiguration(LocalDirectoryConfiguration localDirectoryConfiguration) {
+        this.localDirectoryConfiguration = localDirectoryConfiguration;
     }
 
 }
