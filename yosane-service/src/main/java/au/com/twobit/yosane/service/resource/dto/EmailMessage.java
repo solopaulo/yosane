@@ -1,5 +1,8 @@
 package au.com.twobit.yosane.service.resource.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 public class EmailMessage {
     private String recipient;
     private String subject;

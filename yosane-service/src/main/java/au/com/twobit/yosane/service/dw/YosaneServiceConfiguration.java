@@ -6,6 +6,15 @@ import io.dropwizard.Configuration;
 public class YosaneServiceConfiguration extends Configuration {
     private EmailConfiguration emailConfiguration;
     private LocalDirectoryConfiguration localDirectoryConfiguration;
+    public boolean isMockScannerModule() {
+        return mockScannerModule;
+    }
+
+    public void setMockScannerModule(boolean mockScannerModule) {
+        this.mockScannerModule = mockScannerModule;
+    }
+
+    private boolean mockScannerModule;
     
     public YosaneServiceConfiguration() {
     }

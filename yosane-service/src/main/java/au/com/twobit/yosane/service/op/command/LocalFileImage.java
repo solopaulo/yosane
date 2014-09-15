@@ -13,42 +13,42 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.twobit.yosane.service.resource.dto.EmailMessage;
+import au.com.twobit.yosane.service.resource.dto.LocalFileMessage;
 import au.com.twobit.yosane.service.send.SendFiles;
-import au.com.twobit.yosane.service.send.provider.SendFilesEmail;
+import au.com.twobit.yosane.service.send.provider.SendFilesLocalDir;
 import au.com.twobit.yosane.service.storage.Storage;
 
 import com.google.common.collect.Lists;
 
-public class EmailImage implements Runnable {
-
+public class LocalFileImage implements Runnable {
     private Storage storage;
     private String imageFormat;
-    private EmailMessage emailMessage;
-    private SendFiles sendEmail;
+    private LocalFileMessage localFileMessage;
+    private SendFiles sendFiles;
     private static final Logger log = LoggerFactory.getLogger(EmailImage.class);
 
     @Inject
-    public EmailImage(Storage storage, @Named("imageOutputFormat") String imageFormat, @Named("sendEmail") SendFiles sendEmail) {
+    public LocalFileImage(Storage storage, @Named("imageOutputFormat") String imageFormat, @Named("sendLocalFile") SendFiles sendFiles) {
         this.storage = storage;
         this.imageFormat = imageFormat;
-        this.sendEmail = sendEmail;
+        this.sendFiles = sendFiles;
     }
+    
 
-    public EmailImage send(EmailMessage emailMessage) {
-        this.emailMessage = emailMessage;
+    public LocalFileImage send(LocalFileMessage localFileMessage) {
+        this.localFileMessage = localFileMessage;
         return this;
     }
-
+    
     @Override
     public void run() {
         try {
             List<File>tempFiles = Lists.newArrayList();
-            for (String imageIdentifier : emailMessage.getImageIdentifiers() ) {
+            for (String imageIdentifier : localFileMessage.getImageIdentifiers() ) {
                 BufferedImage image = storage.loadImage(imageIdentifier);
                 File tempFile = File.createTempFile(imageIdentifier, String.format(".%s",imageFormat));
                 if (!tempFile.canWrite()) {
-                    log.error("Unable to write the image to a temporary file for emailing: {}",tempFile.getName());
+                    log.error("Unable to write the image to a temporary file for sending local file: {}",tempFile.getName());
                     continue;
                 }    
                 ImageIO.write(image, imageFormat, tempFile);
@@ -56,9 +56,9 @@ public class EmailImage implements Runnable {
             }
             
             Map<String,String> settings = new LinkedHashMap<String,String>();
-            settings.put(SendFilesEmail.RECIPIENT, emailMessage.getRecipient()); 
+            settings.put(SendFilesLocalDir.LOCAL_DIR, localFileMessage.getLocalPath()); 
             // send files by email to recipient
-            sendEmail.sendFilesTo(settings, tempFiles.toArray(new File[]{}));
+            sendFiles.sendFilesTo(settings, tempFiles.toArray(new File[]{}));
             for ( File tempFile : tempFiles ) {
                 tempFile.delete();
             }

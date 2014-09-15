@@ -40,7 +40,7 @@ public class HomeResource {
                 .withLink("scanners", ScannersResource.class.getAnnotation(Path.class).value())
                 .withLink("images",ImagesResource.class.getAnnotation(Path.class).value())
                 .withLink("documents", DocumentsResource.class.getAnnotation(Path.class).value())
-                .withLink("emails", EmailsResource.class.getAnnotation(Path.class).value());        
+                .withLink("send", SendResource.class.getAnnotation(Path.class).value());        
         return Response.ok( response.toString( DefaultRepresentationFactory.HAL_JSON ) ).build();
     }
     

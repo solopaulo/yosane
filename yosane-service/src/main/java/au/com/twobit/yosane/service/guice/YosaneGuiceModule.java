@@ -8,6 +8,7 @@ import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
 import au.com.twobit.yosane.service.send.SendFiles;
 import au.com.twobit.yosane.service.send.provider.SendFilesEmailACE;
+import au.com.twobit.yosane.service.send.provider.SendFilesLocalDir;
 import au.com.twobit.yosane.service.storage.ArtifactCleanup;
 import au.com.twobit.yosane.service.storage.FileStorage;
 import au.com.twobit.yosane.service.storage.FileStorageArtifactCleanup;
@@ -37,17 +38,20 @@ public class YosaneGuiceModule extends AbstractModule {
     public ExecutorService getExecutorService() {
         return executorService;
     }
+    
     @Override
     protected void configure() {
         configureHalBuilder();
         configureMiscellany();     
         configureYosaneSettings();
-        configureEmail();
-//        install( new SaneDependencyModule() );
-        
-        MockSaneDependencyModule m = new MockSaneDependencyModule();
-        requestInjection(m);
-        install( m );
+        configureSend();
+        if ( configuration.isMockScannerModule() ) {
+            MockSaneDependencyModule m = new MockSaneDependencyModule();
+            requestInjection(m);
+            install( m );
+        } else {
+            install( new SaneDependencyModule() );
+        }
     }
 
     private void configureYosaneSettings() {
@@ -78,8 +82,10 @@ public class YosaneGuiceModule extends AbstractModule {
         bind(DefaultRepresentationFactory.class).toInstance( jsonFactory );        
    }
 
-   private void configureEmail() {
+   private void configureSend() {
        bind(EmailConfiguration.class).toInstance( configuration.getEmailConfiguration());
-       bind(SendFiles.class).to(SendFilesEmailACE.class);
+       bind(SendFiles.class).annotatedWith( Names.named("sendEmail")).to(SendFilesEmailACE.class);
+       bind(SendFiles.class).annotatedWith( Names.named("sendLocalFile")).to( SendFilesLocalDir.class);
+       
    }
 }

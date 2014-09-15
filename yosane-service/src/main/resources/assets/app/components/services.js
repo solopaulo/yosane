@@ -18,9 +18,14 @@ yosaneServices.factory('restful', ['$resource',
               }).fetch({},cb,errcb);
         },
         emailImage : function() {
-            return $resource('/email/image',{}, {
+            return $resource('/send/email/image',{}, {
                send : { method:'POST' }
             });
+        },
+        copyImage : function() {
+            return $resource('/send/localfile/image',{}, {
+                send : { method:'POST' }
+             });
         }
     };
   }]);

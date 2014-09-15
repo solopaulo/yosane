@@ -1,3 +1,8 @@
+mockScannerModule : false
+localDirectoryConfiguration:
+ createDirectoryForEachDay : true
+ localPaths:
+    - /mnt/pvr-shared/
 emailConfiguration:
  smtpHost: somehost.com
  smtpPort: 25

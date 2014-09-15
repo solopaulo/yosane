@@ -118,7 +118,7 @@ yosaneApp.controller('ScanningController',
     /** Return false if we are showing placeholder (i.e. post-init or after discard image) */
     $scope.hasScanned = function() {
         return scannerService.scannedImage != scannerService.defaultImage;
-    }
+    };
     
     $scope.emailImage = function() {
         var images = imageService.images.slice(-1);
@@ -126,10 +126,15 @@ yosaneApp.controller('ScanningController',
             console.log("failed to send email");
             return;
         } 
-        restful.emailImage().send({},{imageIdentifier:images[0].identifier},
-                function(resp) {
-                    console.log('email accepted');
-                    console.log(resp);
-        }).send();        
-    }
+        restful.emailImage().send({},{"imageIdentifiers": [ images[0].identifier]});        
+    };
+    
+    $scope.localfileCopyImage = function() {
+        var images = imageService.images.slice(-1);
+        if ( images.length != 1 ) {
+            console.log("failed to local copy file");
+            return;
+        } 
+        restful.copyImage().send({},{"imageIdentifiers": [ images[0].identifier]});        
+    };
 }]);
