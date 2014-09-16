@@ -1,7 +1,10 @@
 package au.com.twobit.yosane.service.guice;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -16,34 +19,37 @@ import au.com.twobit.yosane.service.device.ScanHardware;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 import com.google.inject.AbstractModule;
 
 public class MockSaneDependencyModule extends AbstractModule {
-    final List<Device>devices = Lists.newArrayList();
+    final List<Device> devices = Lists.newArrayList();
     private boolean done = false;
     private int imageIndex = 0;
-    
+
     @Inject
     private EncodeDecode coder;
-    
+
     public MockSaneDependencyModule() {
     }
 
-    @PostConstruct public void init() {
-        if ( done ) {
+    @PostConstruct
+    public void init() {
+        if (done) {
             return;
         }
         done = true;
         String name = "mustek:0xs41s92";
-        devices.add(new Device("Mustek","McMuster","Flatbed A3 Scanner",name,coder.encodeString(name)));
+        devices.add(new Device("Mustek", "McMuster", "Flatbed A3 Scanner", name, coder.encodeString(name)));
         name = "fujitsu:00sd9x8";
-        devices.add( new Device("Fujitsu","Firewire Flatbed Scanner","Slimline Flatbed",name,coder.encodeString(name)) );
+        devices.add(new Device("Fujitsu", "Firewire Flatbed Scanner", "Slimline Flatbed", name, coder.encodeString(name)));
     }
-    
+
     @Override
-    protected void configure() {        
+    protected void configure() {
         ScanHardware mockHardware = new ScanHardware() {
-            
+
             @Override
             public List<Device> getListOfScanDevices() {
                 init();
@@ -53,7 +59,7 @@ public class MockSaneDependencyModule extends AbstractModule {
             @Override
             public Device getScanDeviceDetails(String scanDeviceIdentifier) throws IllegalArgumentException {
                 for (Device d : getListOfScanDevices()) {
-                    if ( d.getName().equals( scanDeviceIdentifier ) ) {
+                    if (d.getName().equals(scanDeviceIdentifier)) {
                         return d;
                     }
                 }
@@ -71,22 +77,25 @@ public class MockSaneDependencyModule extends AbstractModule {
                 BufferedImage img = null;
                 try {
                     Thread.sleep(2250);
-                } catch (Exception x) { }
+                } catch (Exception x) {
+                }
                 try {
-                    File fileinput = null;
-                    Path path = Paths.get( getClass().getResource("/").toURI());
-                    File [] files = path.resolve("../../src/main/resources/mockimages").toFile().listFiles();
-                    fileinput = files[ imageIndex % files.length ];
-                    img = ImageIO.read(fileinput);
-                    imageIndex++;
+                    // open the image resource list
+                    InputStream is = getClass().getClassLoader().getResourceAsStream("mockimages/resourcelist.txt");
+                    // read in the file listing
+                    String[] files = CharStreams.toString(new InputStreamReader(is)).split("\n");
+                    Closeables.close(is, true);
+
+                    String file = files[imageIndex++ % files.length];
+                    img = ImageIO.read(getClass().getClassLoader().getResourceAsStream(String.format("mockimages/%s", file)));
                 } catch (Exception x) {
                     x.printStackTrace();
                 }
                 return img;
             }
-            
+
         };
-        bind(ScanHardware.class).toInstance( mockHardware );
+        bind(ScanHardware.class).toInstance(mockHardware);
     }
 
 }

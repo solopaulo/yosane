@@ -15,7 +15,7 @@ public class YosaneServiceConfiguration extends Configuration {
         this.mockScannerModule = mockScannerModule;
     }
 
-    private boolean mockScannerModule;
+    private boolean mockScannerModule = false;
     
     public YosaneServiceConfiguration() {
     }
