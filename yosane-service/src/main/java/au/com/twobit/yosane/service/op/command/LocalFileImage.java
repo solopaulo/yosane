@@ -25,7 +25,7 @@ public class LocalFileImage implements Runnable {
     private String imageFormat;
     private LocalFileMessage localFileMessage;
     private SendFiles sendFiles;
-    private static final Logger log = LoggerFactory.getLogger(EmailImage.class);
+    private static final Logger log = LoggerFactory.getLogger(LocalFileImage.class);
 
     @Inject
     public LocalFileImage(Storage storage, @Named("imageOutputFormat") String imageFormat, @Named("sendLocalFile") SendFiles sendFiles) {

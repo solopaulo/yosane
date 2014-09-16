@@ -3,6 +3,7 @@ package au.com.twobit.yosane.service.guice;
 import java.util.concurrent.ExecutorService;
 
 import au.com.twobit.yosane.service.dw.EmailConfiguration;
+import au.com.twobit.yosane.service.dw.LocalDirectoryConfiguration;
 import au.com.twobit.yosane.service.dw.YosaneServiceConfiguration;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
@@ -84,6 +85,7 @@ public class YosaneGuiceModule extends AbstractModule {
 
    private void configureSend() {
        bind(EmailConfiguration.class).toInstance( configuration.getEmailConfiguration());
+       bind(LocalDirectoryConfiguration.class).toInstance( configuration.getLocalDirectoryConfiguration() );
        bind(SendFiles.class).annotatedWith( Names.named("sendEmail")).to(SendFilesEmailACE.class);
        bind(SendFiles.class).annotatedWith( Names.named("sendLocalFile")).to( SendFilesLocalDir.class);
        

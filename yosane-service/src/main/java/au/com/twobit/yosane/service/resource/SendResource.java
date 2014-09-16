@@ -29,6 +29,7 @@ public class SendResource {
                         LocalFileImage localFileImage) {
         this.executorService = executorService;
         this.emailImage = emailImage;
+        this.localFileImage = localFileImage;
     }
     
     @POST
