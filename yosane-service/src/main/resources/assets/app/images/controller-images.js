@@ -8,4 +8,18 @@ yosaneApp.controller('ImagesController',['$scope','$http','imageService',functio
     $scope.preview = function(img) {
        alert('previewing '+img);
     };
+    
+    $scope.toggleSelected = function(idx) {
+        if ( idx >= $scope.images.length ) {
+            return;
+        }
+        $scope.images[idx].selected = !$scope.images[idx].selected;        
+    };
+    
+    $scope.selectedClass = function(idx) {
+        if ( idx >= $scope.images.length ) {
+            return;
+        }
+        return $scope.images[idx].selected ? 'imageSelected' : '';
+    }
 }]);

@@ -1,5 +1,13 @@
-<ul>
-	<li class="thumbnail" ng-repeat="image in images"
-		title="{{$index + 1}}"><img
-		ng-src="{{image._links.imageDownloadThumb[0].href}}" /></li>
-</ul>
+<div class="col-md-2"></div>
+<div class="col-md-8">
+ <ul class="no-left-padding">
+  <li class="thumbnail" ng-repeat="image in images" title="{{$index + 1}} - {{image.selected}}" ng-click="toggleSelected($index)"
+   ng-class="selectedClass($index)">
+    <div class="caption text-center"> Image </div>
+     <img ng-src="{{image._links.imageDownloadThumb[0].href}}"/>
+     <div class="caption text-center">
+        {{image.outputFormat}}
+     </div>
+  </li>
+ </ul>
+</div>
