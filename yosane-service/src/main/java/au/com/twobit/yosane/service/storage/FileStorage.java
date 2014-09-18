@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -214,6 +215,13 @@ public class FileStorage implements Storage {
         public String path() {
             return folderName;
         }
+    }
+
+
+    @Override
+    public Date getImageLastModifiedDate(String imageIdentifier) throws StorageException {
+        File file = getFileOf(IMAGES,imageIdentifier,IMAGE_FILE_NAME);
+        return new Date(file == null ? 0L :  file.lastModified());
     }
 
 }

@@ -1,12 +1,8 @@
 package au.com.twobit.yosane.service.guice;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import javax.annotation.PostConstruct;

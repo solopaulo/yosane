@@ -217,6 +217,6 @@ public class SendFilesLocalDirTest {
         int d = cal.get( Calendar.DAY_OF_MONTH );
                 
         String calendarDate = String.format("%s-%02d-%02d",y,m,d);
-        Assert.assertEquals(calendarDate,local.sdf.format( new Date() ));
+        Assert.assertEquals(calendarDate,SendFilesLocalDir.sdf.format( new Date() ));
     }
 }

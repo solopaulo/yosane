@@ -59,7 +59,7 @@ public class ImagesResource {
     @Relation(relation="image",method=METHOD_GET_IMAGE_DETAILS)
     public Response getImageDetails(@PathParam("imageId") String imageIdentifier) throws Exception {
         ImageStatus status = storage.getImageStatus(imageIdentifier);
-        Image image = new Image(imageIdentifier,ImageFormat.png.name(),status);
+        Image image = new Image(imageIdentifier,ImageFormat.png.name(),status, storage.getImageLastModifiedDate(imageIdentifier));
         String pathbase = String.format("%s/%s",getClass().getAnnotation(Path.class).value(),imageIdentifier);
         Link home = createLink(HomeResource.class);
         Link scanners = createLink(ScannersResource.class);

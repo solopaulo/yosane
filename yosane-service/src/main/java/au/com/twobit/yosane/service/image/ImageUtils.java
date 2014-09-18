@@ -17,6 +17,6 @@ public final class ImageUtils {
     }
     
     public static Image createImageWithTicket(String ticket) {
-        return new Image(ticket, null,ImageStatus.ACCEPTED);
+        return new Image(ticket, null,ImageStatus.ACCEPTED,null);
     }
 }

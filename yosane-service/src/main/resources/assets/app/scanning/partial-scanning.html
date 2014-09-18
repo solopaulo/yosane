@@ -1,8 +1,12 @@
-<div>
- <div class="col-1">
+<br/>
+<div class="row">
+<div class="col-md-2"></div>
+<div class="col-md-8"><!--  <div class="col-1">
+ -->
   <a href="" class="thumbnail"> <img class="media-object" ng-src="{{getScannedImage()}}" alt="...">
   </a>
  </div>
+</div>
 
  <!--  THE SCAN BUTTON -->
  <div class="btn-group" dropdown>
@@ -36,7 +40,7 @@
   </button>
   <ul class="dropdown-menu textleft" role="menu">
    <li  ng-click="emailImage()">
-        <a href="#"> 
+        <a href="#">    
             <span class="pull-left glyphicon glyphicon-envelope" style='margin-right: 0.6em;'></span>
             by <strong>Email</strong> to ...            
         </a>

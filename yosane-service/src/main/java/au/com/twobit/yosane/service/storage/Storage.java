@@ -1,6 +1,7 @@
 package au.com.twobit.yosane.service.storage;
 
 import java.awt.image.BufferedImage;
+import java.util.Date;
 
 import au.com.twobit.yosane.api.DocumentOfImages;
 import au.com.twobit.yosane.api.ImageStatus;
@@ -83,6 +84,14 @@ public interface Storage {
      */
     public ImageStatus getImageStatus(String imageIdentifier) throws StorageException;
 
+    /**
+     * Gets the last known modified date of the image
+     * 
+     * @param imageIdentifier
+     * @return - returns the Date of last modification of the image
+     */
+    public Date getImageLastModifiedDate(String imageIdentifier) throws StorageException;
+    
     /** Verifies the status is as requested
      * 
      * @param imageIdentifier the unique identifier for the image
