@@ -17,7 +17,7 @@ import com.google.common.io.Resources;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Representation;
 
-@Path("/")
+@Path("/yosane")
 @Relation(relation="home")
 public class HomeResource {
     final static URI HOME = UriBuilder.fromResource(HomeResource.class).build();
@@ -45,6 +45,7 @@ public class HomeResource {
     }
     
     @GET
+    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     public Response webHome() {
         String index = null; 

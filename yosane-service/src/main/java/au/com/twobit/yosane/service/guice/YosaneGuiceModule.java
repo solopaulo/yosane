@@ -2,9 +2,9 @@ package au.com.twobit.yosane.service.guice;
 
 import java.util.concurrent.ExecutorService;
 
-import au.com.twobit.yosane.service.dw.EmailConfiguration;
-import au.com.twobit.yosane.service.dw.LocalDirectoryConfiguration;
 import au.com.twobit.yosane.service.dw.YosaneServiceConfiguration;
+import au.com.twobit.yosane.service.dw.config.EmailConfiguration;
+import au.com.twobit.yosane.service.dw.config.LocalDirectoryConfiguration;
 import au.com.twobit.yosane.service.image.ImageFormat;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
 import au.com.twobit.yosane.service.send.SendFiles;
@@ -62,7 +62,7 @@ public class YosaneGuiceModule extends AbstractModule {
         bind(String.class).annotatedWith(Names.named("imageOutputFormat")).toInstance(ImageFormat.png.name());
         // register the file storage class for image persistence
         bind(Storage.class).to(FileStorage.class);
-        bind(String.class).annotatedWith(Names.named("staleTime")).toInstance("1d");
+        bind(String.class).annotatedWith(Names.named("staleTime")).toInstance( configuration.getFileStorageConfiguration().getStaleTime() );
         bind(ArtifactCleanup.class).to(FileStorageArtifactCleanup.class);
         // set the default thumbnail scale length (width)
         requestStaticInjection(CreateThumbnail.class);

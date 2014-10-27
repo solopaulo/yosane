@@ -30,3 +30,19 @@ body { padding:1em;}
 .no-left-padding {
 	padding-left:0;
 }
+.no-top-margin {
+	 margin-top:0 !important;
+}
+
+.ng-hide-add         {
+	-webkit-animation:0.5s bounceOut ease; display:block !important;
+	animation:0.5s bounceOut  ease; display:block !important;
+}
+
+.mirrored {
+	-moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+	-o-transform: scale(-1, 1);
+	-ms-transform: scale(-1, 1);
+	transform: scale(-1, 1);
+}

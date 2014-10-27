@@ -72,7 +72,7 @@ public class MockSaneDependencyModule extends AbstractModule {
             public BufferedImage acquireImage(String scanDeviceIdentifier, String ticket, DeviceOption... options) throws IllegalArgumentException, Exception {
                 BufferedImage img = null;
                 try {
-                    Thread.sleep(2250);
+                    Thread.sleep(1500);
                 } catch (Exception x) {
                 }
                 try {

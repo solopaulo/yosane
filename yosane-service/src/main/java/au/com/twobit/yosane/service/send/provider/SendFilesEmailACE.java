@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.MultiPartEmail;
 
-import au.com.twobit.yosane.service.dw.EmailConfiguration;
+import au.com.twobit.yosane.service.dw.config.EmailConfiguration;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;

@@ -26,7 +26,7 @@ import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Link;
 import com.theoryinpractise.halbuilder.api.Representation;
 
-@Path("/documents")
+@Path("/yosane/documents")
 @Relation(relation="documents")
 public class DocumentsResource {
     private final String GET_DOCUMENT           = "GET DOCUMENT";

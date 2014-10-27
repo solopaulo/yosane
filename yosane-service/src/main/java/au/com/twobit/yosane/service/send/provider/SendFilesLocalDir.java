@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import org.joda.time.DateTime;
 
-import au.com.twobit.yosane.service.dw.LocalDirectoryConfiguration;
+import au.com.twobit.yosane.service.dw.config.LocalDirectoryConfiguration;
 import au.com.twobit.yosane.service.send.SendFiles;
 
 import com.google.common.base.Optional;

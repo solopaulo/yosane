@@ -7,7 +7,7 @@ yosaneServices.factory('restful', ['$resource',
   function($resource){
     return {
         getScanners : function(cb,errcb) {
-            return $resource('/scanners', {}, {
+            return $resource('/yosane/scanners', {}, {
               query: {method:'GET', params:{}, isArray:false}
             }).get({},cb, errcb);
         },
@@ -18,12 +18,17 @@ yosaneServices.factory('restful', ['$resource',
               }).fetch({},cb,errcb);
         },
         emailImage : function() {
-            return $resource('/send/email/image',{}, {
+            return $resource('/yosane/send/email/image',{}, {
                send : { method:'POST' }
             });
         },
+        emailPdf : function() {
+            return $resource('/yosane/send/email/pdf',{}, {
+               send : { method:'POST' }
+            });
+        },        
         copyImage : function() {
-            return $resource('/send/localfile/image',{}, {
+            return $resource('/yosane/send/localfile/image',{}, {
                 send : { method:'POST' }
              });
         }
@@ -46,8 +51,8 @@ yosaneServices.factory('scannerService',[function() {
     return {
         selected : "",
         currentScanner : {},
-        defaultImage : '/assets/images/180x240.gif',
-        scannedImage : '/assets/images/180x240.gif',
+        defaultImage : 'yosane/assets/images/180x240.gif',
+        scannedImage : 'yosane/assets/images/180x240.gif',
         scanners : [],
         status : "",
         emptyScannerList : [ { name : "", title : "No scanners available"}]

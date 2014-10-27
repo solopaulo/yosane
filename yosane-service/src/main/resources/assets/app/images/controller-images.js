@@ -61,5 +61,20 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             "imageIdentifiers" : selectedIdentifiers
         });
     };
+    
+    $scope.emailPdf = function() {
+        var selectedIdentifiers = $scope.images.filter(function(e) {
+            return e.selected;
+        }).map(function(e) {
+            return e.identifier;
+        });
 
+        if (selectedIdentifiers.length < 1) {
+            console.log("failed to send email");
+            return;
+        }
+        restful.emailPdf().send({}, {
+            "imageIdentifiers" : selectedIdentifiers
+        });
+    };
 } ]);

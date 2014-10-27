@@ -46,7 +46,7 @@ import com.theoryinpractise.halbuilder.api.Representation;
  * @author paul
  * 
  */
-@Path("/scanners")
+@Path("/yosane/scanners")
 @Relation(relation="scanners")
 public class ScannersResource {
     final static String METHOD_GET_SCANNER = "GET SCANNER";

@@ -10,25 +10,28 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import au.com.twobit.yosane.service.op.command.EmailImage;
+import au.com.twobit.yosane.service.op.command.EmailPdf;
 import au.com.twobit.yosane.service.op.command.LocalFileImage;
 import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.resource.dto.EmailMessage;
 import au.com.twobit.yosane.service.resource.dto.LocalFileMessage;
 import au.com.twobit.yosane.service.storage.Storage;
 
-@Path("/send")
+@Path("/yosane/send")
 @Relation(relation="send")
 public class SendResource {
     private ExecutorService executorService;
     private EmailImage emailImage;
+    private EmailPdf emailPdf;
     private LocalFileImage localFileImage;
     
     @Inject
     public SendResource(Storage storage, ExecutorService executorService, 
-                        EmailImage emailImage, 
+                        EmailImage emailImage, EmailPdf emailPdf,
                         LocalFileImage localFileImage) {
         this.executorService = executorService;
         this.emailImage = emailImage;
+        this.emailPdf = emailPdf;
         this.localFileImage = localFileImage;
     }
     
@@ -42,6 +45,19 @@ public class SendResource {
             return Response.serverError().entity("That is bad").build();
         }        
         executorService.execute(emailImage.send( emailMessage ) );
+        return Response.ok().build();
+    }
+    
+    @POST
+    @Path("/email/pdf")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response sendEmailPdf(EmailMessage emailMessage) {
+        if ( emailMessage == null 
+                || emailMessage.getImageIdentifiers() == null
+                || emailMessage.getImageIdentifiers().length == 0 ) {
+            return Response.serverError().entity("That is bad").build();
+        }        
+        executorService.execute(emailPdf.send( emailMessage ) );
         return Response.ok().build();
     }
 

@@ -34,7 +34,7 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         
     @Override
     public void initialize(Bootstrap<YosaneServiceConfiguration> configuration) {
-        configuration.addBundle( new AssetsBundle("/assets","/assets"));        
+        configuration.addBundle( new AssetsBundle("/assets","/yosane/assets"));        
     }
 
     @Override

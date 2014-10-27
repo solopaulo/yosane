@@ -2,29 +2,42 @@
 <div class="col-md-8">
  <br />
  <ul class="no-left-padding">
-  <li class="thumbnail" ng-repeat="image in images" ng-class="selectedClass($index)">
-   <div class="well well-sm text-center">{{image.lastModified | date : 'EEE, h:mm:ss a'}}</div> 
-   <a href="">
-    <img ng-click="toggleSelected($index)" ng-src="{{image._links.imageDownloadThumb[0].href}}" />
+  <li class="thumbnail" ng-repeat="image in images" ng-class="selectedClass($index)" ng-show="!image.deleted">
+   <div class="well well-sm text-center">
+    {{image.lastModified | date : 'EEE, h:mm:ss a'}}
+    <div class="pull-right btn label label-danger" ng-click="image.deleted = true; image.selected = false;">
+     <span class="glyphicon glyphicon-remove"></span>
+    </div>
+   </div> <a href=""> <img ng-click="toggleSelected($index)" ng-src="{{image._links.imageDownloadThumb[0].href}}" />
+  </a>
+   <div class="caption text-center"></div>
+   <a href>
+    <span class="glyphicon glyphicon-repeat mirrored pull-left"></span>
     </a>
-   <div class="caption text-center">
-        <div class="btn btn-danger" ng-click="deleteImage()"><span class="glyphicon glyphicon-remove"></span></div>
-   </div>
+    <a href>
+    <span class="glyphicon glyphicon-repeat pull-right"></span>
+    </a>
+    OH AYE!
   </li>
  </ul>
 
- <div class="btn-group position-from-right dropup" dropdown>
-  <button type="button" class="btn dropdown-toggle" ng-disabled="(!imagesSelected())">
-   <span class="glyphicon glyphicon-send"></span> <span>Send selected images ...</span> <span class="caret"></span> <span class="sr-only">Split button!</span>
-  </button>
-  <ul class="dropdown-menu textleft" role="menu">
-   <li ng-click="emailImages()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-envelope" style='margin-right: 0.6em;'></span>
-     by <strong>Email</strong> to ...
-   </a></li>
-   <li ng-click="localfileCopyImages()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-folder-open"
-     style='margin-right: 0.6em;'></span> to a <strong>Folder</strong> ...
-   </a></li>
-  </ul>
- </div>
-
+ <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+  <div class="btn-group position-from-right dropup" dropdown>
+   <button type="button" class="btn dropdown-toggle" ng-disabled="(!imagesSelected())">
+    <span class="glyphicon glyphicon-send"></span> <span>Send selected images ...</span> <span class="caret"></span> <span class="sr-only">Split
+     button!</span>
+   </button>
+   <ul class="dropdown-menu textleft" role="menu">
+    <li ng-click="emailImages()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-envelope"
+      style='margin-right: 0.6em;'></span> by <strong>Email (Images)</strong> to ...
+    </a></li>
+    <li ng-click="emailPdf()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-envelope"
+      style='margin-right: 0.6em;'></span> by <strong>Email (PDF)</strong> to ...
+    </a></li>
+    <li ng-click="localFileCopyImages()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-folder-open"
+      style='margin-right: 0.6em;'></span> to a <strong>Folder</strong> ...
+    </a></li>
+   </ul>
+  </div>
+ </nav>
 </div>

@@ -32,7 +32,7 @@ import com.theoryinpractise.halbuilder.api.Link;
 import com.theoryinpractise.halbuilder.api.Representation;
 import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 
-@Path("/images")
+@Path("/yosane/images")
 public class ImagesResource {
     public static final String METHOD_GET_IMAGE_FILE    = "GET IMAGE FILE";
     public static final String METHOD_GET_IMAGE_THUMB   = "GET IMAGE THUMB";

@@ -13,7 +13,6 @@ yosaneApp.controller('ScanningController',
     
     /** Refresh the list of scanners */
     $scope.refreshScannerList = function() {
-        scannerService.currentScanner = undefined;
         restful.getScanners(function(data) {   
             scannerService.scanners = data._links.scanner;            
         }, function(r) {
@@ -66,7 +65,7 @@ yosaneApp.controller('ScanningController',
             setTimeout( function() { $scope.scanningProgress( response ); },0);
             $scope.$modalInstance = $modal.open({
                 size:'sm',
-                templateUrl:'/assets/app/components/partial-dialog-progress.html',
+                templateUrl:'yosane/assets/app/components/partial-dialog-progress.html',
                 scope:$scope
             });
         }, function(r) {

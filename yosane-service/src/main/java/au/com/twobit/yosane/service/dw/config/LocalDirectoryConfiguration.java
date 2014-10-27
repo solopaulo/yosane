@@ -1,4 +1,4 @@
-package au.com.twobit.yosane.service.dw;
+package au.com.twobit.yosane.service.dw.config;
 
 import java.util.List;
 
