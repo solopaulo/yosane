@@ -1,9 +1,14 @@
 package au.com.twobit.yosane.service.resource.dto;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
 
 public class EmailMessage {
     private String recipient;
     private String subject;
+    @NotNull @NotEmpty
     private String [] imageIdentifiers;
 
     public String getRecipient() {

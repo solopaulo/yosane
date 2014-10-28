@@ -2,7 +2,6 @@ package au.com.twobit.yosane.service.op.command;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.concurrent.Callable;
 
 import javax.inject.Named;
 
@@ -13,19 +12,15 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.PngImage;
 
-public class CreatePDFDocument implements Callable<byte[]>{
+public class CreatePDFDocument {
 
-    private File [] imageFiles;
-    
     private final String imageOutputFormat;
     
-    public CreatePDFDocument(@Named("imageOutputFormat") String imageOutputFormat,File [] imageFiles) {
+    public CreatePDFDocument(@Named("imageOutputFormat") String imageOutputFormat) {
         this.imageOutputFormat = imageOutputFormat;
-        this.imageFiles = imageFiles;
     }
     
-    @Override
-    public byte[] call() throws Exception {
+    public byte[] generatePdfData(File [] imageFiles) throws Exception {
         if ( imageFiles == null || imageFiles.length == 0 ) {
             return new byte[]{};
         }

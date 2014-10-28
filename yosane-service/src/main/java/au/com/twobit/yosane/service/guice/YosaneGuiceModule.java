@@ -2,11 +2,18 @@ package au.com.twobit.yosane.service.guice;
 
 import java.util.concurrent.ExecutorService;
 
+import javax.inject.Named;
+
 import au.com.twobit.yosane.service.dw.YosaneServiceConfiguration;
 import au.com.twobit.yosane.service.dw.config.EmailConfiguration;
 import au.com.twobit.yosane.service.dw.config.LocalDirectoryConfiguration;
 import au.com.twobit.yosane.service.image.ImageFormat;
+import au.com.twobit.yosane.service.op.command.CreatePDFDocument;
 import au.com.twobit.yosane.service.op.command.CreateThumbnail;
+import au.com.twobit.yosane.service.op.delivery.ContentDelivery;
+import au.com.twobit.yosane.service.op.delivery.ContentDeliveryFactory;
+import au.com.twobit.yosane.service.op.delivery.ContentDeliveryImpl;
+import au.com.twobit.yosane.service.op.delivery.PdfArtifactCreator;
 import au.com.twobit.yosane.service.send.SendFiles;
 import au.com.twobit.yosane.service.send.provider.SendFilesEmailACE;
 import au.com.twobit.yosane.service.send.provider.SendFilesLocalDir;
@@ -21,6 +28,7 @@ import au.com.twobit.yosane.service.utils.UUIDTicketGenerator;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.json.JsonRepresentationFactory;
@@ -88,6 +96,18 @@ public class YosaneGuiceModule extends AbstractModule {
        bind(LocalDirectoryConfiguration.class).toInstance( configuration.getLocalDirectoryConfiguration() );
        bind(SendFiles.class).annotatedWith( Names.named("sendEmail")).to(SendFilesEmailACE.class);
        bind(SendFiles.class).annotatedWith( Names.named("sendLocalFile")).to( SendFilesLocalDir.class);
-       
+       install( new FactoryModuleBuilder()
+                   .implement(ContentDelivery.class, ContentDeliveryImpl.class)
+                   .build(ContentDeliveryFactory.class));
+   }
+   
+   @Provides
+   public CreatePDFDocument createCreatePDFDocument(@Named("imageOutputFormat") String imageOutputFormat) {
+       return new CreatePDFDocument(imageOutputFormat);
+   }
+   
+   @Provides
+   public PdfArtifactCreator createPdfArtifactCreator(CreatePDFDocument createPdfDocument) {
+       return new PdfArtifactCreator(createPdfDocument);
    }
 }
