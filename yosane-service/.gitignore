@@ -2,3 +2,5 @@
 target/
 server.yaml
 server.old.yaml
+src/main/resources/assets/images/wallpaper*
+src/main/resources/assets/app/bower_components/app

@@ -35,14 +35,14 @@ public class ContentDeliveryImpl implements ContentDelivery {
     @Inject
     public ContentDeliveryImpl(Storage storage, 
                                @Named("imageOutputFormat") String imageOutputFormat,
-                               @Named("sendEmail") SendFiles sendFiles,
+                               @Assisted SendFiles sendFiles,
                                @Assisted String [] imageIdentifiers,
                                @Assisted Map<String,String> deliverySettings,
                                @Assisted ArtifactCreator artifactCreator) {
         this.storage = storage;
         this.imageOutputFormat = imageOutputFormat;
-        this.sendFiles = sendFiles;
         
+        this.sendFiles = sendFiles;        
         this.imageIdentifiers = imageIdentifiers;
         this.deliverySettings = deliverySettings;
         this.artifactCreator = artifactCreator;

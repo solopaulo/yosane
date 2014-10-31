@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -18,72 +19,63 @@ import au.com.twobit.yosane.service.op.delivery.PassthroughArtifactCreator;
 import au.com.twobit.yosane.service.op.delivery.PdfArtifactCreator;
 import au.com.twobit.yosane.service.resource.annotations.Relation;
 import au.com.twobit.yosane.service.resource.dto.EmailMessage;
-import au.com.twobit.yosane.service.resource.dto.LocalFileMessage;
+import au.com.twobit.yosane.service.send.SendFiles;
 import au.com.twobit.yosane.service.send.provider.SendFilesEmail;
-import au.com.twobit.yosane.service.send.provider.SendFilesLocalDir;
 import au.com.twobit.yosane.service.storage.Storage;
 
 import com.google.common.collect.Maps;
 
-@Path("/yosane/send")
+@Path("/yosane/send/email")
 @Relation(relation="send")
-public class SendResource {
+public class SendToEmailResource {
     private ExecutorService executorService;
     private ContentDeliveryFactory deliveryFactory;
     private PdfArtifactCreator pdfArtifactCreator;
+    private PassthroughArtifactCreator passthroughArtifactCreator = new PassthroughArtifactCreator();
+    private SendFiles sendFilesByEmail;
     
     @Inject
-    public SendResource(Storage storage, 
+    public SendToEmailResource(Storage storage, 
                         ExecutorService executorService,
                         ContentDeliveryFactory deliveryFactory,
-                        PdfArtifactCreator pdfArtifactCreator) {
+                        PdfArtifactCreator pdfArtifactCreator,
+                        @Named("sendEmail") SendFiles sendFilesByEmail) {
         this.executorService = executorService;
         this.deliveryFactory = deliveryFactory;
         this.pdfArtifactCreator = pdfArtifactCreator;
+        this.sendFilesByEmail = sendFilesByEmail;
     }
     
     @POST
-    @Path("/email/image")
+    @Path("/image")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendEmailImage(@Valid EmailMessage emailMessage) {
-        return createEmailResponse(emailMessage, new PassthroughArtifactCreator());
+        return createEmailResponse(emailMessage, passthroughArtifactCreator);
     }
     
     @POST
-    @Path("/email/pdf")
+    @Path("/pdf")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendEmailPdf(@Valid EmailMessage emailMessage) {
         return createEmailResponse(emailMessage, pdfArtifactCreator);
-    }
-
-    @POST
-    @Path("/localfile/image")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendLocalfileImage(@Valid LocalFileMessage localFileMessage) {
-        return createLocalFileResponse(localFileMessage, new PassthroughArtifactCreator());
-    }
+    }    
     
-    @POST
-    @Path("/localfile/pdf")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendLocalfilePdf(@Valid LocalFileMessage localFileMessage) {
-        return createLocalFileResponse(localFileMessage, pdfArtifactCreator);
-    }
-    
+    /** Sends an email to the recipient by building artifacts using the creator specified
+     * 
+     * @param emailMessage Settings for the email, to be passed to the SendFiles implementation. Currently only doing recipient
+     * @param artifactCreator The implementation of the artifact creator, which generates the files that will be attachments on the email
+     * @return Returns a response to send back to the client. As these operations are asynchronous we should really give them a ticket to
+     *          check or something
+     */
     Response createEmailResponse(EmailMessage emailMessage, ArtifactCreator artifactCreator) {
+        // creates a new map for settings
         Map<String,String> settings = Maps.newHashMap();
         settings.put(SendFilesEmail.RECIPIENT, emailMessage.getRecipient());
-        ContentDelivery delivery = deliveryFactory.create( emailMessage.getImageIdentifiers(), settings, artifactCreator);
+        // get a delivery factory that combines the generation of artifacts with the magic of delivery.
+        ContentDelivery delivery = deliveryFactory.create( emailMessage.getImageIdentifiers(), settings,sendFilesByEmail, artifactCreator);
         executorService.execute( delivery );
         return Response.ok().build();
     }
     
-    Response createLocalFileResponse(LocalFileMessage localFileMessage, ArtifactCreator artifactCreator) {
-        Map<String,String> settings = Maps.newHashMap();
-        settings.put(SendFilesLocalDir.LOCAL_DIR, localFileMessage.getLocalPath()); 
-        ContentDelivery delivery = deliveryFactory.create( localFileMessage.getImageIdentifiers(), settings, artifactCreator);
-        executorService.execute(delivery);
-        return Response.ok().build();
-    }
 
 }
