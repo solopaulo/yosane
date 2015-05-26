@@ -52,6 +52,7 @@ public final class ResourceHelper {
             Relation relation = method.getAnnotation(Relation.class);
             link = new Link(null,relation.relation(), UriBuilder.fromResource(resourceClass).path(method).build(params).toString());
         } catch (Exception x) { 
+            x.printStackTrace();
             String error = String.format("Failed to create link: %s",x.getMessage());
             log.error(error);
         }

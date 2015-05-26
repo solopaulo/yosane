@@ -4,6 +4,7 @@
 var yosaneApp = angular.module('yosaneApp');
 yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'restful', function($scope, $http, imageService, restful) {
     $scope.images = imageService.images;
+    $scope.naming = "";
 
     $scope.preview = function(img) {
         alert('previewing ' + img);
@@ -23,6 +24,10 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
         return $scope.images[idx].selected ? 'imageSelected' : '';
     };
 
+    $scope.clearImages = function() {
+        $scope.images = imageService.images = [];
+    };
+    
     $scope.imagesSelected = function() {
         for (var i = 0; i < $scope.images.length; i++) {
             if ($scope.images[i].selected) {
@@ -43,7 +48,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             console.log("failed to send email");
             return;
         }
-        restful.copyImage().send({},{"imageIdentifiers": selectedIdentifiers});    
+        restful.copyImage().send({},{"imageIdentifiers": selectedIdentifiers,"naming": $scope.naming});    
     };
 
     $scope.emailImages = function() {
@@ -58,7 +63,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             return;
         }
         restful.emailImage().send({}, {
-            "imageIdentifiers" : selectedIdentifiers
+            "imageIdentifiers" : selectedIdentifiers, "naming" : $scope.naming
         });
     };
     
@@ -74,7 +79,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             return;
         }
         restful.emailPdf().send({}, {
-            "imageIdentifiers" : selectedIdentifiers
+            "imageIdentifiers" : selectedIdentifiers, "name" : $scope.naming
         });
     };
 } ]);

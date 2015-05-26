@@ -1,1 +1,25 @@
-<h2 class="alert alert-warning">Settings!</h2>
+<div ng-form="settingsForm">
+ <div ng-repeat="group in settingsGroups" class="panel panel-success">
+  <div class="panel-heading text-left">
+   <h3>{{group}}</h3>
+  </div>
+
+  <div class="panel-body">
+   <ul class="list-group">
+
+    <li class="text-left list-group-item" ng-repeat="setting in settingsForGroup(group)">
+     <h5>
+      {{setting.name}} <small>{{setting.description}}</small>
+     </h5>
+     <div ng-if="setting.constraintType == 'STRING_LIST_CONSTRAINT' || setting.constraintType == 'VALUE_LIST_CONSTRAINT'">
+      <select name="{{setting.name}}" value="{{setting.value}}" 
+        ng-model="setting.value" ng-change="registerChange('{{setting.name}}')"
+        ng-options="option as option for option in setting.range">
+            <option style="display:none" value="">dummy option</option>  
+       </select>
+     </div>
+    </li>
+   </ul>
+  </div>
+ </div>
+</div>

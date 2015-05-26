@@ -2,6 +2,8 @@ package au.com.twobit.yosane.service.send.provider;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +52,24 @@ public class SendFilesLocalDir implements SendFiles {
         if ( writeDailyDirectory ) {
             outputDirectory = createDailyDirectory(outputDirectory);
         }
+        
+        String naming = settings.get( SendFiles.NAMING );
+        if ( ! Strings.isNullOrEmpty(naming) ) {
+            outputDirectory = createDirectory( outputDirectory, naming );
+        }
                 
         // write the files to the output directory
+        int seq = 1;
+        DecimalFormat df = new DecimalFormat(Strings.repeat("0", String.valueOf(files.length).length() + 1));
+        
         for ( File outfile : files) {
-            Files.copy(outfile, outputDirectory.toPath().resolve( outfile.getName() ).toFile() );
+            String name = outfile.getName();
+            
+            if ( ! Strings.isNullOrEmpty(naming) ) {
+                name = String.format("%s-%s",naming,df.format(seq++));
+                name += outfile.getName().substring(outfile.getName().lastIndexOf("."));
+            }
+            Files.copy(outfile, outputDirectory.toPath().resolve( name ).toFile() );
         }        
     }
 
@@ -101,13 +117,16 @@ public class SendFilesLocalDir implements SendFiles {
      */
     File createDailyDirectory(File outputDirectory) throws Exception {
         String daily = sdf.format(DateTime.now().toDate());
-                
-        Path dailyPath = outputDirectory.toPath().resolve( daily );
-        File dirDailyPath = dailyPath.toFile();
-        if ( ( ! dirDailyPath.exists()) && ! dirDailyPath.mkdir() ) {
-            throw new Exception("Unable to create new path: "+dirDailyPath.getPath());
+        return createDirectory(outputDirectory,daily);
+    }
+    
+    File createDirectory(File outputDirectory,String lastPath) throws Exception {
+        Path path = outputDirectory.toPath().resolve( lastPath );
+        File dirPath = path.toFile();
+        if ( ( ! dirPath.exists()) && ! dirPath.mkdir() ) {
+            throw new Exception("Unable to create new path: "+dirPath.getPath());
         }
-        return dirDailyPath;
+        return dirPath;
     }
     
 

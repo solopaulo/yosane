@@ -11,6 +11,7 @@ import java.util.Map;
  *
  */
 public interface SendFiles {
+    public static final String NAMING = "NAMING";
     public void sendFilesTo(Map<String,String> settings, File ... files) throws Exception;
     public String getDestinationDescription();
 }

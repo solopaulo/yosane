@@ -9,6 +9,7 @@ public class LocalFileMessage {
     
     @NotNull @NotEmpty
     private String [] imageIdentifiers;
+    private String naming;
 
     public String [] getImageIdentifiers() {
         return imageIdentifiers;
@@ -24,5 +25,13 @@ public class LocalFileMessage {
 
     public void setLocalPath(String localPath) {
         this.localPath = localPath;
+    }
+
+    public String getNaming() {
+        return naming;
+    }
+
+    public void setNaming(String naming) {
+        this.naming = naming;
     }
 }

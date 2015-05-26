@@ -10,6 +10,7 @@ public class EmailMessage {
     private String subject;
     @NotNull @NotEmpty
     private String [] imageIdentifiers;
+    private String naming;
 
     public String getRecipient() {
         return recipient;
@@ -32,5 +33,13 @@ public class EmailMessage {
     }
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public String getNaming() {
+        return naming;
+    }
+
+    public void setNaming(String naming) {
+        this.naming = naming;
     }
 }

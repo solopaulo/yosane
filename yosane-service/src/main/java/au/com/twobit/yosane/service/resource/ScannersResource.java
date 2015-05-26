@@ -100,13 +100,21 @@ public class ScannersResource {
         try {
             List<Device>scanningDevices = hardware.getListOfScanDevices();
             for (Device device : scanningDevices) {
-                response.withLink(
+                response
+                    .withLink(
                         "scanner",
                         createLink(ScannersResource.class,METHOD_GET_SCANNER,device.getId()).getHref(),
                         device.getName(),
                         String.format("%s %s", device.getVendor(),device.getModel()),
                         null,
                         null);
+                
+                response.withLink("settings", 
+                        createLink(ScannersResource.class,METHOD_GET_OPTIONS,device.getId()).getHref(),
+                        device.getName(),
+                        String.format("Settings: %s",device.getName()),
+                        null,null);
+                
             }
             response.withProperty("scanners", scanningDevices);
         } catch (Exception x) {
@@ -133,7 +141,7 @@ public class ScannersResource {
         try {
             Device scanner = hardware.getScanDeviceDetails(coder.decodeString(scannerId));
             Link scanHomeLink = createLink(ScannersResource.class);
-            Link scanOptionsLink = createLink(ScannersResource.class,ScannersResource.METHOD_GET_OPTIONS,scannerId);
+            Link scanOptionsLink = createLink(ScannersResource.class,METHOD_GET_OPTIONS,scannerId);
             response.withBean(scanner)
                     .withLink(scanHomeLink.getRel(),scanHomeLink.getHref())
                     .withLink(scanOptionsLink.getRel(),scanOptionsLink.getHref());
@@ -190,7 +198,7 @@ public class ScannersResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    @Relation(relation="options",method=METHOD_GET_OPTIONS)
+    @Relation(relation="settings",method=METHOD_GET_OPTIONS)
     public Response getScannerOptions(@PathParam("scannerId") String scannerId) {
         Representation response = hal.newRepresentation( createLink(ScannersResource.class,METHOD_GET_OPTIONS, scannerId).getHref());        
         try {

@@ -71,6 +71,7 @@ public class SendToEmailResource {
         // creates a new map for settings
         Map<String,String> settings = Maps.newHashMap();
         settings.put(SendFilesEmail.RECIPIENT, emailMessage.getRecipient());
+        settings.put(SendFiles.NAMING, emailMessage.getNaming());
         // get a delivery factory that combines the generation of artifacts with the magic of delivery.
         ContentDelivery delivery = deliveryFactory.create( emailMessage.getImageIdentifiers(), settings,sendFilesByEmail, artifactCreator);
         executorService.execute( delivery );

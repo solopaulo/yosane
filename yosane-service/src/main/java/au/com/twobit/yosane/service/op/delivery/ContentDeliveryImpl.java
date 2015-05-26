@@ -31,6 +31,7 @@ public class ContentDeliveryImpl implements ContentDelivery {
     
     private Map<String,String> deliverySettings;
     private String [] imageIdentifiers;
+    private String naming;
     
     @Inject
     public ContentDeliveryImpl(Storage storage, 
@@ -61,7 +62,7 @@ public class ContentDeliveryImpl implements ContentDelivery {
      * @return A List of File objects that were written to local file locations
      */
     @Override
-    public Collection<File> generateLocalSourceFiles(String[] imageIdentifiers) {
+    public Collection<File> generateLocalSourceFiles(String[] imageIdentifiers, String naming) {
         List<File> tempFiles = Lists.newArrayList();
         if ( imageIdentifiers == null || imageIdentifiers.length == 0 ) {
             return tempFiles;
@@ -102,7 +103,7 @@ public class ContentDeliveryImpl implements ContentDelivery {
     @Override
     public void run() {
         // create local source files
-        Collection<File> sourceFiles = generateLocalSourceFiles(imageIdentifiers);
+        Collection<File> sourceFiles = generateLocalSourceFiles(imageIdentifiers,naming);
         
         // generate artifacts for delivery
         Collection<File> artifacts = Lists.newArrayList();

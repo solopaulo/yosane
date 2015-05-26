@@ -13,8 +13,12 @@ yosaneApp.controller('ScanningController',
     
     /** Refresh the list of scanners */
     $scope.refreshScannerList = function() {
-        restful.getScanners(function(data) {   
-            scannerService.scanners = data._links.scanner;            
+        restful.getScanners(function(data) {
+            scannerService.scanners = data._links.scanner;
+            scannerService.settings = data._links.settings;
+            if ( scannerService.scanners.length == 1 ) {
+                $scope.selectScanner( scannerService.scanners[0].name );
+            }
         }, function(r) {
             scannerService.scanners = scannerService.emptyScannerList;
             scannerService.selected = name;
@@ -51,7 +55,7 @@ yosaneApp.controller('ScanningController',
                 continue;
             }
             scannerService.selected = name;
-            scannerService.currentScanner = scannerService.scanners[i];
+            scannerService.currentScanner = scannerService.scanners[i];            
         }        
     };
     
@@ -61,16 +65,20 @@ yosaneApp.controller('ScanningController',
         if ( scannerService.currentScanner === undefined ) {
             return;
         }
-        restful.scanImage({url:scannerService.currentScanner.href},function(response) {
-            setTimeout( function() { $scope.scanningProgress( response ); },0);
-            $scope.$modalInstance = $modal.open({
-                size:'sm',
-                templateUrl:'yosane/assets/app/components/partial-dialog-progress.html',
-                scope:$scope
+        var deviceOptions = scannerService.buildDeviceOptions();
+        restful.scanImage({
+                url:scannerService.currentScanner.href,
+                options : deviceOptions
+            },function(response) {
+                setTimeout( function() { $scope.scanningProgress( response ); },0);
+                $scope.$modalInstance = $modal.open({
+                    size:'sm',
+                    templateUrl:'yosane/assets/app/components/partial-dialog-progress.html',
+                    scope:$scope
+                });
+            }, function(r) {
+                $scope.refreshScannerList();
             });
-        }, function(r) {
-            $scope.refreshScannerList();
-        });
     };
     
     /** Update the scanning progress */

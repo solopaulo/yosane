@@ -1,6 +1,10 @@
 <div class="col-md-2"></div>
 <div class="col-md-8">
  <br />
+ <label for="naming">Name</label>
+ <input id="naming" type="text" size="20" placeholder="Enter a name for the collection" ng-model="naming"/>
+ <button class="btn btn-default" ng-click="clearImages()">Clear images</button>
+ 
  <ul class="no-left-padding">
   <li class="thumbnail" ng-repeat="image in images" ng-class="selectedClass($index)" ng-show="!image.deleted">
    <div class="well well-sm text-center">

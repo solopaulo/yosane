@@ -14,9 +14,10 @@ public interface ContentDelivery extends Runnable {
      *  The list of written temporary files is returned in a collection
      *  
      * @param imageIdentifiers The list of image identifiers that will be retrieved from a Storage interface implementation
+     * @param naming An optional naming string that may be used in a naming scheme
      * @return A List of File objects that were written to local file locations
      */
-    public Collection<File> generateLocalSourceFiles(String [] imageIdentifiers);
+    public Collection<File> generateLocalSourceFiles(String [] imageIdentifiers, String naming);
     
     
     /** Cleans up local files used for processing

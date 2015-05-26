@@ -104,7 +104,7 @@ public class SendFilesLocalDirTest {
             Assert.assertTrue( tempDir.delete() );
             tempFile.delete();
         }
-        Mockito.verify(local, Mockito.times(1)).createDailyDirectory( Mockito.any( File.class ) );
+        Mockito.verify(local, Mockito.times(1)).createDirectory( Mockito.any( File.class ) , Mockito.anyString());
     }
 
     @Test
@@ -129,7 +129,7 @@ public class SendFilesLocalDirTest {
             Assert.assertTrue( tempDir.delete() );
             tempFile.delete();
         }
-        Mockito.verify(local, Mockito.times(0)).createDailyDirectory( Mockito.any( File.class ) );
+        Mockito.verify(local, Mockito.times(0)).createDirectory( Mockito.any( File.class ), Mockito.anyString());
     }
 
     @Test

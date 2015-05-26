@@ -71,8 +71,9 @@ public class SendToFileResource {
         // creates a new map for settings
         Map<String,String> settings = Maps.newHashMap();
         settings.put(SendFilesLocalDir.LOCAL_DIR, localFileMessage.getLocalPath()); 
+        settings.put( SendFiles.NAMING,  localFileMessage.getNaming());
         // get a delivery factory that combines the generation of artifacts with the magic of delivery.
-        ContentDelivery delivery = deliveryFactory.create( localFileMessage.getImageIdentifiers(), settings, sendFilesLocally, artifactCreator);
+        ContentDelivery delivery = deliveryFactory.create( localFileMessage.getImageIdentifiers(),  settings, sendFilesLocally, artifactCreator);
         executorService.execute(delivery);
         return Response.ok().build();
     }

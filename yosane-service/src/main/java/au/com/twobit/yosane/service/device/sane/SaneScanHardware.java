@@ -149,6 +149,7 @@ public class SaneScanHardware implements ScanHardware {
                 }
             });
         } catch (ExecutionException x) {
+            x.printStackTrace();
             throw new IllegalArgumentException(x.getCause().getMessage());
         }
         return options;
@@ -168,6 +169,7 @@ public class SaneScanHardware implements ScanHardware {
         try {
             // get a list of devices from sane
             session = createSaneSession();
+            session.setPasswordProvider(SanePasswordProvider.usingDotSanePassFile());
             device = session.getDevice(scanDeviceIdentifier);
             device.open();
             options.addAll(Collections2.transform(device.listOptions(), new TransformSaneOptionToDeviceOption()));
@@ -287,7 +289,8 @@ public class SaneScanHardware implements ScanHardware {
     private void closeSaneSession(SaneSession session) {
         try {
             session.close();
-        } catch (Exception x) {
+        } catch (Throwable x) {
+            x.printStackTrace();
         }
     }
 }
