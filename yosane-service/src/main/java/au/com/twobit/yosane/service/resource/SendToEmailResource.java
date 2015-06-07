@@ -7,11 +7,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import au.com.twobit.yosane.service.dw.YosaneServiceConfiguration;
+import au.com.twobit.yosane.service.dw.config.EmailConfiguration;
 import au.com.twobit.yosane.service.op.delivery.ArtifactCreator;
 import au.com.twobit.yosane.service.op.delivery.ContentDelivery;
 import au.com.twobit.yosane.service.op.delivery.ContentDeliveryFactory;
@@ -33,17 +37,30 @@ public class SendToEmailResource {
     private PdfArtifactCreator pdfArtifactCreator;
     private PassthroughArtifactCreator passthroughArtifactCreator = new PassthroughArtifactCreator();
     private SendFiles sendFilesByEmail;
+    private YosaneServiceConfiguration configuration;
     
     @Inject
     public SendToEmailResource(Storage storage, 
                         ExecutorService executorService,
                         ContentDeliveryFactory deliveryFactory,
                         PdfArtifactCreator pdfArtifactCreator,
-                        @Named("sendEmail") SendFiles sendFilesByEmail) {
+                        @Named("sendEmail") SendFiles sendFilesByEmail,
+                        YosaneServiceConfiguration configuration) {
         this.executorService = executorService;
         this.deliveryFactory = deliveryFactory;
         this.pdfArtifactCreator = pdfArtifactCreator;
         this.sendFilesByEmail = sendFilesByEmail;
+        this.configuration = configuration;
+    }
+    
+    @GET
+    @Path("/config")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sendLocalfileConfig() {
+        EmailConfiguration ec = configuration.getEmailConfiguration();
+        Map<String,Object>response = Maps.newHashMap();
+        response.put("recipients", ec.getRecipients());
+        return Response.ok(response).build();
     }
     
     @POST

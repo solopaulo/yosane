@@ -10,19 +10,24 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.MultiPartEmail;
 
+import au.com.twobit.yosane.api.NotificationType;
 import au.com.twobit.yosane.service.dw.config.EmailConfiguration;
+import au.com.twobit.yosane.service.resource.dto.Notification;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 
 public class SendFilesEmailACE  implements SendFilesEmail  {
 
     private EmailConfiguration emailConfiguration;
-
+    private EventBus eventBus;
+    
     @Inject
-    public SendFilesEmailACE(@NotNull EmailConfiguration emailSettings) {
+    public SendFilesEmailACE(@NotNull EmailConfiguration emailSettings,EventBus eventBus) {
         this.emailConfiguration = emailSettings;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -43,17 +48,26 @@ public class SendFilesEmailACE  implements SendFilesEmail  {
         try {
             email = transformEmailSettingsToMultiPartEmail(emailConfiguration);
             email.setTo( Lists.newArrayList( InternetAddress.parse(recipient)));
-            applyFilesToEmailAsAttachments(email, files);
+            String naming = settings.get( NAMING );
+            applyFilesToEmailAsAttachments(email, naming,files );
         } catch (Exception x) {
             throw new Exception("Failed configuring the email: " + x.getMessage());
         }
 
         email.send();
+        Notification notification = Notification.create(
+                String.format("Sent email with %s attachments",files.length),
+                NotificationType.COMPLETED_EMAIL_SENT);
+        eventBus.post( notification );
     }
 
-    protected void applyFilesToEmailAsAttachments(MultiPartEmail email, File ...files) throws Exception {
+    protected void applyFilesToEmailAsAttachments(MultiPartEmail email, String naming, File ...files) throws Exception {
+        int count = 0;
         for (File input : files) {
-            EmailAttachment attachment = transformFileToEmailAttachment(input);
+            String filename = input.getName();
+            String suffix = files.length == 0 ? "" : String.format(" %s",++count);
+            String name = Strings.isNullOrEmpty(naming) ? null : String.format("%s%s%s",naming,suffix,filename.substring(filename.lastIndexOf(".")));
+            EmailAttachment attachment = transformFileToEmailAttachment(input, name);
             if (attachment == null) {
                 // log an error
                 continue;
@@ -62,14 +76,14 @@ public class SendFilesEmailACE  implements SendFilesEmail  {
         }
     }
     
-    protected EmailAttachment transformFileToEmailAttachment(File input) {
+    protected EmailAttachment transformFileToEmailAttachment(File input, String name) {
         if (input == null || !input.exists()) {
             return null;
         }
         EmailAttachment attachment = new EmailAttachment();
         attachment.setPath(input.getPath());
         attachment.setDescription("A file scanned by Yosane");
-        attachment.setName(input.getName());
+        attachment.setName( Strings.isNullOrEmpty(name) ? input.getName() : name);
         attachment.setDisposition(input.getName());
         return attachment;
     }

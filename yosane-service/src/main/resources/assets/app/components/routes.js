@@ -4,6 +4,7 @@
 var yosaneApp = angular.module('yosaneApp');
 yosaneApp.config(['$routeProvider',function($routeProvider) {
     $routeProvider
+        .when('/notifications', {templateUrl: '/yosane/assets/app/notifications/partial-notifications.html', controller : 'NotificationsController'})
         .when('/scanning', {templateUrl: '/yosane/assets/app/scanning/partial-scanning.html', controller : 'ScanningController'})        
         .when('/images',{templateUrl:'/yosane/assets/app/images/partial-images.html',controller : 'ImagesController'})
         .when('/documents',{templateUrl: '/yosane/assets/app/documents/partial-documents.html',controller : 'DocumentsController'})

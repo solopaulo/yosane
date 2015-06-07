@@ -9,12 +9,15 @@ var yosaneApp = angular.module('yosaneApp',[
     'ngAnimate'
 ]);
 
-function TabsController($scope,$rootScope,$location,imageService) {
+function TabsController($scope,$rootScope,$location,$timeout,imageService,notificationService,configService) {
+    $scope.notificationTab = { link : '#/notifications', label : '', icon : '', notifications : function() {
+        return notificationService.newNotifications.length;
+    }};
     $scope.tabs = [
       { link : '#/scanning', label: 'Scan', icon: 'glyphicon-inbox'},
       { link : '#/images', label : 'Img', icon : 'glyphicon-picture'},
       { link : '#/documents', label : 'Doc', icon: 'glyphicon-file'},
-      { link : '#/settings', label : '', icon: 'glyphicon-cog'}
+      { link : '#/settings', label : '', icon: 'glyphicon-wrench'}
     ];
     
     $scope.setSelectedTab = function(tab) {
@@ -33,6 +36,14 @@ function TabsController($scope,$rootScope,$location,imageService) {
         return "";
       }
     };
-
+    
+    
     $scope.setSelectedTab();
+    (function tick() {
+        notificationService.poll();
+        $timeout(tick,7500);
+      })(); 
+    
+    configService.updateLocalPaths();
+    configService.updateRecipients();
 };

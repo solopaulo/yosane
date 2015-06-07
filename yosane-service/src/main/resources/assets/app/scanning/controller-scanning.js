@@ -4,12 +4,16 @@
 var yosaneApp = angular.module('yosaneApp');
 yosaneApp.controller('ScanningController',
  // @Inject
- ['$scope','$http','restful','imageService','scannerService','$modal',
- function($scope,$http,restful,imageService,scannerService,$modal) {
+ ['$scope','$http','restful','imageService','scannerService','$modal','configService',
+ function($scope,$http,restful,imageService,scannerService,$modal,configService) {
     /** When the scanning tab is selected, refresh the list of scanners */
     $scope.$on('scanningTabSelected',function(event) {
-      $scope.refreshScannerList();  
+        if ( scannerService.scanners.length === 0 ) {
+            $scope.refreshScannerList();    
+        }
     });
+    
+    $scope.cs = configService;
     
     /** Refresh the list of scanners */
     $scope.refreshScannerList = function() {
@@ -127,21 +131,21 @@ yosaneApp.controller('ScanningController',
         return scannerService.scannedImage != scannerService.defaultImage;
     };
     
-    $scope.emailImage = function() {
+    $scope.emailImage = function(recipient) {
         var images = imageService.images.slice(-1);
         if ( images.length != 1 ) {
             console.log("failed to send email");
             return;
         } 
-        restful.emailImage().send({},{"imageIdentifiers": [ images[0].identifier]});        
+        restful.emailImage().send({},{"imageIdentifiers": [ images[0].identifier],"recipient":recipient});        
     };
     
-    $scope.localfileCopyImage = function() {
+    $scope.localfileCopyImage = function(path) {
         var images = imageService.images.slice(-1);
         if ( images.length != 1 ) {
             console.log("failed to local copy file");
             return;
         } 
-        restful.copyImage().send({},{"imageIdentifiers": [ images[0].identifier]});        
+        restful.copyImage().send({},{"imageIdentifiers": [ images[0].identifier], localPath : path});        
     };
 }]);

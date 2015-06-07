@@ -1,9 +1,14 @@
+
+<div class="col-md-12 text-left form-group form-inline" style='margin-top:0.6em;'>
+  <label for="naming" class="label label-info">Name</label>
+  <input id="naming" type="text" size="25" placeholder="Enter a name for the collection"
+    class="form-control" ng-model="naming"/>
+   <button class="form-control btn btn-danger" ng-click="clearImages()">Reset</button>
+ </div>
+ 
+</div>
 <div class="col-md-2"></div>
 <div class="col-md-8">
- <br />
- <label for="naming">Name</label>
- <input id="naming" type="text" size="20" placeholder="Enter a name for the collection" ng-model="naming"/>
- <button class="btn btn-default" ng-click="clearImages()">Clear images</button>
  
  <ul class="no-left-padding">
   <li class="thumbnail" ng-repeat="image in images" ng-class="selectedClass($index)" ng-show="!image.deleted">
@@ -32,15 +37,36 @@
      button!</span>
    </button>
    <ul class="dropdown-menu textleft" role="menu">
-    <li ng-click="emailImages()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-envelope"
-      style='margin-right: 0.6em;'></span> by <strong>Email (Images)</strong> to ...
-    </a></li>
-    <li ng-click="emailPdf()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-envelope"
-      style='margin-right: 0.6em;'></span> by <strong>Email (PDF)</strong> to ...
-    </a></li>
-    <li ng-click="localFileCopyImages()" class="dropdown-toggle"><a href> <span class="pull-left glyphicon glyphicon-folder-open"
-      style='margin-right: 0.6em;'></span> to a <strong>Folder</strong> ...
-    </a></li>
+    <li role="presentation" class="dropdown-header">
+        <span class="pull-left glyphicon glyphicon-envelope" style='margin-right: 0.6em;'></span>
+        <strong class="text-danger">EMAIL - IMAGES</strong>
+    </li>
+    <li ng-repeat="recipient in cs.recipients" role="presentation">
+       <a href="#" ng-click="emailImages(recipient)" role="menuitem">
+        To <span class="h5"><strong>{{recipient}}</strong></span>
+       </a>
+    </li>
+    <li role="presentation" class="divider"></li>
+    <li role="presentation" class="dropdown-header">
+        <span class="pull-left glyphicon glyphicon-envelope" style='margin-right: 0.6em;'></span>
+        <strong class="text-danger">EMAIL - PDF</strong>
+    </li>
+    <li ng-repeat="recipient in cs.recipients">
+       <a href="#" ng-click="emailPdf(recipient)">
+        To <span class="h5"><strong>{{recipient}}</strong></span>
+       </a>
+    </li>
+    <li role="presentation" class="divider"></li>
+    <li role="presentation" class="dropdown-header">
+        <span class="pull-left glyphicon glyphicon-floppy-save" style='margin-right: 0.6em;'></span>
+        <strong class="text-danger">COPY FILES</strong>
+    </li>
+    <li ng-repeat="pathconf in cs.localPaths">
+       <a href="#" ng-click="localFileCopyImages(pathconf.path)">
+        <strong>{{pathconf.name}}</strong>
+        <h5>{{pathconf.path}}</h5>
+       </a>
+    </li>
    </ul>
   </div>
  </nav>

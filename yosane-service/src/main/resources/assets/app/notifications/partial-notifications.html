@@ -1,0 +1,8 @@
+<ul class="list-group">
+    <li ng-repeat="notification in notifications track by $index"
+        class="text-left list-group-item {{ns.themeNotification(notification.notificationType)}}">
+        <span><strong>{{notification.timestamp|date:'shortTime'}}</strong></span>
+        <span>{{notification.message}}</span>
+        <div><small>{{notification.notificationType}}</small></div>
+    </li>
+</ul>

@@ -119,6 +119,7 @@ public class ContentDeliveryImpl implements ContentDelivery {
         try {
             sendFiles.sendFilesTo(deliverySettings, artifacts.toArray( new File[]{}));
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("An error occurred sending files: "+e.getMessage());
         }
         

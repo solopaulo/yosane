@@ -4,7 +4,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -19,8 +18,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import au.com.twobit.yosane.service.dw.config.LocalDirectoryConfiguration;
 import au.com.twobit.yosane.service.storage.Storage;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.google.common.io.Files;
 
 @RunWith(MockitoJUnitRunner.class )
@@ -31,10 +30,12 @@ public class SendFilesLocalDirTest {
     private LocalDirectoryConfiguration configuration;
     @Mock
     private Storage storage;
+    @Mock
+    private EventBus eventBus;
     
     @Before
     public void setUp() {
-        local = Mockito.spy( new SendFilesLocalDir(configuration) );        
+        local = Mockito.spy( new SendFilesLocalDir(configuration,eventBus) );        
     }
 
     @Test
@@ -72,7 +73,7 @@ public class SendFilesLocalDirTest {
         try {
             Map<String,String> settings = Maps.newHashMap();
             Mockito.when( configuration.getDefaultDirectory()).thenReturn("/toot");
-            Mockito.when( configuration.getLocalPaths() ).thenReturn( Lists.newArrayList("/root","/boot"));
+            Mockito.when( configuration.getLocalPaths() ).thenReturn( Maps.<String,String>newHashMap() );
             local.sendFilesTo(settings, new File[] { new File("/tmp") });
             Assert.fail();
         } catch (Exception x) {
@@ -86,7 +87,10 @@ public class SendFilesLocalDirTest {
         
         File tempDir = Files.createTempDir();
         File tempFile = File.createTempFile("abc", "123");
-        Mockito.when ( configuration.getLocalPaths() ).thenReturn( Lists.newArrayList( tempDir.getPath()));
+        Map<String,String> acceptablePathsMap = Maps.newHashMap();
+        acceptablePathsMap.put("first", tempDir.getPath());
+
+        Mockito.when ( configuration.getLocalPaths() ).thenReturn( acceptablePathsMap );
         try {
             Mockito.when(configuration.getDefaultDirectory()).thenReturn(tempDir.getPath());
             local.sendFilesTo(Maps.<String,String>newHashMap(), new File[] { tempFile });
@@ -113,7 +117,10 @@ public class SendFilesLocalDirTest {
         
         File tempDir = Files.createTempDir();
         File tempFile = File.createTempFile("abc", "123");
-        Mockito.when ( configuration.getLocalPaths() ).thenReturn( Lists.newArrayList( tempDir.getPath()));
+        Map<String,String> acceptablePathsMap = Maps.newHashMap();
+        acceptablePathsMap.put("first", tempDir.getPath());
+        
+        Mockito.when ( configuration.getLocalPaths() ).thenReturn( acceptablePathsMap );
         try {
             Mockito.when(configuration.getDefaultDirectory()).thenReturn(tempDir.getPath());
             local.sendFilesTo(Maps.<String,String>newHashMap(), new File[] { tempFile });
@@ -197,16 +204,17 @@ public class SendFilesLocalDirTest {
     
     @Test
     public void testIsAcceptablePath() {
-        List<String>acceptablePaths = Lists.newArrayList(
-                "/tmp/acceptable",
-                "/tmp/acceptedWithoutTrailingSlash/"
-                );
-        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptable", acceptablePaths) );
-        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptable/", acceptablePaths) );
-        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptedWithoutTrailingSlash", acceptablePaths) );
-        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptedWithoutTrailingSlash/", acceptablePaths) );
-        Assert.assertFalse( local.isAcceptablePath("/tmp/", acceptablePaths));
-        Assert.assertFalse( local.isAcceptablePath("/tmp/acceptedWithoutTrailingSlash/ButThisNot", acceptablePaths) );
+        Map<String,String>acceptablePathsMap = Maps.newHashMap();
+        acceptablePathsMap.put("first","/tmp/acceptable");
+        acceptablePathsMap.put("second","/tmp/acceptedWithoutTrailingSlash/");
+                
+        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptable", acceptablePathsMap
+                ) );
+        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptable/", acceptablePathsMap) );
+        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptedWithoutTrailingSlash", acceptablePathsMap) );
+        Assert.assertTrue( local.isAcceptablePath("/tmp/acceptedWithoutTrailingSlash/", acceptablePathsMap) );
+        Assert.assertFalse( local.isAcceptablePath("/tmp/", acceptablePathsMap));
+        Assert.assertFalse( local.isAcceptablePath("/tmp/acceptedWithoutTrailingSlash/ButThisNot", acceptablePathsMap) );
     }
     
     @Test

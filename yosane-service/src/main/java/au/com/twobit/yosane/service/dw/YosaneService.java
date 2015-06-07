@@ -18,10 +18,10 @@ import au.com.twobit.yosane.service.guice.YosaneGuiceModule;
 import au.com.twobit.yosane.service.resource.DocumentsResource;
 import au.com.twobit.yosane.service.resource.HomeResource;
 import au.com.twobit.yosane.service.resource.ImagesResource;
+import au.com.twobit.yosane.service.resource.NotificationsResource;
 import au.com.twobit.yosane.service.resource.ScannersResource;
 import au.com.twobit.yosane.service.resource.SendToEmailResource;
 import au.com.twobit.yosane.service.resource.SendToFileResource;
-import au.com.twobit.yosane.service.resource.SettingsResource;
 import au.com.twobit.yosane.service.storage.ArtifactCleanup;
 
 import com.google.inject.Guice;
@@ -52,14 +52,14 @@ public class YosaneService extends Application<YosaneServiceConfiguration> {
         env.jersey().register(injector.getInstance(ScannersResource.class));
         // add resource for image
         env.jersey().register(injector.getInstance(ImagesResource.class));
-        // add resource for settings
-        env.jersey().register(injector.getInstance(SettingsResource.class));
         // add resource for document
         env.jersey().register(injector.getInstance(DocumentsResource.class));
         // add resource for email sending
         env.jersey().register(injector.getInstance(SendToEmailResource.class));
         // add resource for local file sending
         env.jersey().register(injector.getInstance(SendToFileResource.class));
+        // add resource for notifications
+        env.jersey().register(injector.getInstance(NotificationsResource.class));
         // add health check
         env.healthChecks().register("Scanner Availability", injector.getInstance(ScannersAvailable.class));
         // add a timer to run the artifact cleanup

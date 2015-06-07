@@ -27,15 +27,18 @@ import org.slf4j.LoggerFactory;
 import au.com.twobit.yosane.api.Device;
 import au.com.twobit.yosane.api.DeviceOption;
 import au.com.twobit.yosane.api.Image;
+import au.com.twobit.yosane.api.NotificationType;
 import au.com.twobit.yosane.service.device.ScanHardware;
 import au.com.twobit.yosane.service.image.ImageUtils;
 import au.com.twobit.yosane.service.op.command.ScanImage;
 import au.com.twobit.yosane.service.resource.annotations.Relation;
+import au.com.twobit.yosane.service.resource.dto.Notification;
 import au.com.twobit.yosane.service.resource.dto.ScanMessage;
 import au.com.twobit.yosane.service.storage.Storage;
 import au.com.twobit.yosane.service.utils.EncodeDecode;
 import au.com.twobit.yosane.service.utils.TicketGenerator;
 
+import com.google.common.eventbus.EventBus;
 import com.theoryinpractise.halbuilder.DefaultRepresentationFactory;
 import com.theoryinpractise.halbuilder.api.Link;
 import com.theoryinpractise.halbuilder.api.Representation;
@@ -72,19 +75,23 @@ public class ScannersResource {
     /* encoder / decoder */
     final EncodeDecode coder;
     
+    final EventBus eventBus;
+    
     @Inject
     public ScannersResource(ScanHardware hardware,
                             Storage storage,
                             TicketGenerator ticketGenerator,
                             ExecutorService executorService,
                             DefaultRepresentationFactory hal,
-                            EncodeDecode coder) {
+                            EncodeDecode coder,
+                            EventBus eventBus) {
         this.hardware = hardware;
         this.storage = storage;
         this.ticketGenerator = ticketGenerator;
         this.executorService = executorService;
         this.hal = hal;
         this.coder = coder;
+        this.eventBus = eventBus;
     }
     
     
@@ -114,7 +121,7 @@ public class ScannersResource {
                         device.getName(),
                         String.format("Settings: %s",device.getName()),
                         null,null);
-                
+                eventBus.post( Notification.create("Scanner online: "+device.getName(), NotificationType.INFO_SCANNER_ONLINE));
             }
             response.withProperty("scanners", scanningDevices);
         } catch (Exception x) {

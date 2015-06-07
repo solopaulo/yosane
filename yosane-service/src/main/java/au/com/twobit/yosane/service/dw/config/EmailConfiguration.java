@@ -1,5 +1,9 @@
 package au.com.twobit.yosane.service.dw.config;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 public class EmailConfiguration {
     private boolean sslEnabled = false;
     private String smtpHost;
@@ -11,7 +15,16 @@ public class EmailConfiguration {
     private String defaultSenderName = "Yosane Scanner Emails";
     private String defaultRecipient;
     private boolean startTls = false;
+    private List<String> recipients = Lists.newArrayList();
     
+    public List<String> getRecipients() {
+        return recipients;
+    }
+
+    public void setRecipients(List<String> recipients) {
+        this.recipients = recipients;
+    }
+
     public String getDefaultSubject() {
         return defaultSubject;
     }

@@ -2,10 +2,11 @@
  * 
  */
 var yosaneApp = angular.module('yosaneApp');
-yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'restful', function($scope, $http, imageService, restful) {
+yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'restful','configService',
+  function($scope, $http, imageService, restful,configService) {
     $scope.images = imageService.images;
     $scope.naming = "";
-
+    $scope.cs = configService;
     $scope.preview = function(img) {
         alert('previewing ' + img);
     };
@@ -79,7 +80,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             return;
         }
         restful.emailPdf().send({}, {
-            "imageIdentifiers" : selectedIdentifiers, "name" : $scope.naming
+            "imageIdentifiers" : selectedIdentifiers, "naming" : $scope.naming
         });
     };
 } ]);

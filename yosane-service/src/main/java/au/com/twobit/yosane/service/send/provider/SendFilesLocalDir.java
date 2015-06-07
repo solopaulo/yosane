@@ -3,7 +3,6 @@ package au.com.twobit.yosane.service.send.provider;
 import java.io.File;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -12,23 +11,30 @@ import javax.inject.Inject;
 
 import org.joda.time.DateTime;
 
+import au.com.twobit.yosane.api.NotificationType;
 import au.com.twobit.yosane.service.dw.config.LocalDirectoryConfiguration;
+import au.com.twobit.yosane.service.resource.dto.Notification;
 import au.com.twobit.yosane.service.send.SendFiles;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import com.google.common.io.Files;
 
 public class SendFilesLocalDir implements SendFiles {
 
     private LocalDirectoryConfiguration conf;
+    private EventBus eventBus;
     public final static String LOCAL_DIR = "LOCAL_DIR";
     static final SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
     static final String NO_TRAILING_SLASHES = "/*$";
     
+    
     @Inject
-    public SendFilesLocalDir(LocalDirectoryConfiguration conf) {
+    public SendFilesLocalDir(LocalDirectoryConfiguration conf,EventBus eventBus) {
         this.conf = conf;
+        this.eventBus = eventBus;
     }
     
     @Override
@@ -38,10 +44,9 @@ public class SendFilesLocalDir implements SendFiles {
         }
 
         
-        @SuppressWarnings("static-access")
         String localDir = Optional.fromNullable(settings.get( LOCAL_DIR ))
-                                  .fromNullable( conf.getDefaultDirectory() )
-                                  .orNull();
+                                  .or( conf.getDefaultDirectory() );
+                                  
         if ( ! isAcceptablePath( localDir, conf == null ? null : conf.getLocalPaths() ) ) {
             throw new Exception("Not an acceptable output path: "+localDir);
         }
@@ -69,7 +74,14 @@ public class SendFilesLocalDir implements SendFiles {
                 name = String.format("%s-%s",naming,df.format(seq++));
                 name += outfile.getName().substring(outfile.getName().lastIndexOf("."));
             }
-            Files.copy(outfile, outputDirectory.toPath().resolve( name ).toFile() );
+            Path copyTo = outputDirectory.toPath().resolve( name );
+            Files.copy(outfile, copyTo.toFile() );
+            Notification notification = 
+                    Notification.create(
+                            String.format("Wrote %s to disk",copyTo.toString().replaceAll(localDir,"")),
+                            NotificationType.COMPLETED_FILES_COPIED);
+            eventBus.post( notification );
+                    
         }        
     }
 
@@ -78,10 +90,11 @@ public class SendFilesLocalDir implements SendFiles {
      * @param localDir
      * @return Returns true if the path is in our list of accepted paths
      */
-    boolean isAcceptablePath(String localDir, List<String> acceptablePaths) {
-        if ( Strings.isNullOrEmpty( localDir ) || acceptablePaths == null ) {
+    boolean isAcceptablePath(String localDir, Map<String,String> acceptablePathsMap) {
+        if ( Strings.isNullOrEmpty( localDir ) || acceptablePathsMap == null ) {
             return false;
         }
+        List<String>acceptablePaths = Lists.newArrayList( acceptablePathsMap.values());
         for (String acceptablePath : acceptablePaths ) {
             if ( localDir.replaceAll(NO_TRAILING_SLASHES,"").equals( acceptablePath.replaceAll(NO_TRAILING_SLASHES, "") ) ) {
                 return true;

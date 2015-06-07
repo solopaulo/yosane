@@ -26,6 +26,7 @@ import au.com.twobit.yosane.service.utils.TicketGenerator;
 import au.com.twobit.yosane.service.utils.URLEncodeDecode;
 import au.com.twobit.yosane.service.utils.UUIDTicketGenerator;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -64,6 +65,7 @@ public class YosaneGuiceModule extends AbstractModule {
     }
 
     private void configureYosaneSettings() {
+        bind(YosaneServiceConfiguration.class).toInstance(configuration);
         // set up temporary holding area location
         bind(String.class).annotatedWith(Names.named("holdingArea")).toInstance("/tmp/yosane/");
         // set up output image format
@@ -81,6 +83,7 @@ public class YosaneGuiceModule extends AbstractModule {
         // register a ticket generator
         bind(TicketGenerator.class).to(UUIDTicketGenerator.class);
         bind(EncodeDecode.class).to(URLEncodeDecode.class);
+        bind(EventBus.class).toInstance( new EventBus() );
     }
 
     private void configureHalBuilder() {

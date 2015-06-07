@@ -39,18 +39,28 @@
    <span class="glyphicon glyphicon-send"></span> <span>Send</span> <span class="caret"></span> <span class="sr-only">Split button!</span>
   </button>
   <ul class="dropdown-menu textleft" role="menu">
-   <li  ng-click="emailImage()">
-        <a href="#">    
-            <span class="pull-left glyphicon glyphicon-envelope" style='margin-right: 0.6em;'></span>
-            by <strong>Email</strong> to ...            
-        </a>
-   </li>
-   <li ng-click="localfileCopyImage()">   
-        <a href="#">
-           <span class="pull-left glyphicon glyphicon-folder-open" style='margin-right: 0.6em;'></span>
-           to a <strong>Folder</strong> ...                 
-        </a>
-   </li>
-  </ul>
+    <li role="presentation" class="dropdown-header">
+        <span class="pull-left glyphicon glyphicon-envelope" style='margin-right: 0.6em;'></span>
+        <strong class="text-danger">EMAIL - IMAGES</strong>
+    </li>
+    <li ng-repeat="recipient in cs.recipients" role="presentation">
+       <a href="#" ng-click="emailImage(recipient)" role="menuitem">
+        To <span class="h5"><strong>{{recipient}}</strong></span>
+       </a>
+    </li>
+   
+    <li role="presentation" class="divider"></li>
+    <li role="presentation" class="dropdown-header">
+        <span class="pull-left glyphicon glyphicon-floppy-save" style='margin-right: 0.6em;'></span>
+        <strong class="text-danger">COPY FILES</strong>
+    </li>
+    <li ng-repeat="pathconf in cs.localPaths">
+       <a href="#" ng-click="localfileCopyImage(pathconf.path)">
+        <strong>{{pathconf.name}}</strong>
+        <h5>{{pathconf.path}}</h5>
+       </a>
+    </li>
+   </ul>
+  
  </div>
 </div>
