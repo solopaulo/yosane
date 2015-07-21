@@ -64,6 +64,7 @@ public class SendFilesLocalDirTest {
             local.sendFilesTo(Maps.<String,String>newHashMap(), new File[] { new File("/tmp") });
             Assert.fail();
         } catch (Exception x) {
+            x.printStackTrace();
             Assert.assertEquals("Not an acceptable output path: null",x.getMessage());
         }
     }

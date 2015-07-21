@@ -45,7 +45,7 @@ public class SendFilesLocalDir implements SendFiles {
 
         
         String localDir = Optional.fromNullable(settings.get( LOCAL_DIR ))
-                                  .or( conf.getDefaultDirectory() );
+                                  .or( Optional.fromNullable(conf.getDefaultDirectory())).orNull();
                                   
         if ( ! isAcceptablePath( localDir, conf == null ? null : conf.getLocalPaths() ) ) {
             throw new Exception("Not an acceptable output path: "+localDir);

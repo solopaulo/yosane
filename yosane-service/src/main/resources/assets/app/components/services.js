@@ -62,7 +62,8 @@ yosaneServices.factory('imageService',[function() {
       },
       addImage : function(image) {
           this.images.push(image);
-      }  
+      },
+      naming : ""
     };
 }]);
 

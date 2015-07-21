@@ -55,9 +55,8 @@
         <strong class="text-danger">COPY FILES</strong>
     </li>
     <li ng-repeat="pathconf in cs.localPaths">
-       <a href="#" ng-click="localfileCopyImage(pathconf.path)">
+       <a href="#" ng-click="localfileCopyImage(pathconf.path)" title="{{pathconf.path}}">
         <strong>{{pathconf.name}}</strong>
-        <h5>{{pathconf.path}}</h5>
        </a>
     </li>
    </ul>

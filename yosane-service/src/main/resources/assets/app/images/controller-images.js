@@ -5,9 +5,10 @@ var yosaneApp = angular.module('yosaneApp');
 yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'restful','configService',
   function($scope, $http, imageService, restful,configService) {
     $scope.images = imageService.images;
-    $scope.naming = "";
+    $scope.is = imageService;
     $scope.cs = configService;
-    $scope.preview = function(img) {
+    
+    $scope.previewImage = function(img) {
         alert('previewing ' + img);
     };
 
@@ -25,9 +26,20 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
         return $scope.images[idx].selected ? 'imageSelected' : '';
     };
 
-    $scope.clearImages = function() {
-        $scope.images = imageService.images = [];
+    $scope.doReset = function() {
+        $scope.images = $scope.images.map(function(e) {
+            e.deleted = true;
+            e.selected = false;
+            return e;
+        });
+        imageService.naming = "";
     };
+    
+    $scope.selectAll = function() {
+        for (var i = 0; i < $scope.images.length; i++) {
+            $scope.images[i].selected = true;
+        }
+    }
     
     $scope.imagesSelected = function() {
         for (var i = 0; i < $scope.images.length; i++) {
@@ -49,7 +61,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             console.log("failed to send email");
             return;
         }
-        restful.copyImage().send({},{"imageIdentifiers": selectedIdentifiers,"naming": $scope.naming});    
+        restful.copyImage().send({},{"imageIdentifiers": selectedIdentifiers,"naming": imageService.naming});    
     };
 
     $scope.emailImages = function() {
@@ -64,7 +76,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             return;
         }
         restful.emailImage().send({}, {
-            "imageIdentifiers" : selectedIdentifiers, "naming" : $scope.naming
+            "imageIdentifiers" : selectedIdentifiers, "naming" : imageService.naming
         });
     };
     
@@ -80,7 +92,7 @@ yosaneApp.controller('ImagesController', [ '$scope', '$http', 'imageService', 'r
             return;
         }
         restful.emailPdf().send({}, {
-            "imageIdentifiers" : selectedIdentifiers, "naming" : $scope.naming
+            "imageIdentifiers" : selectedIdentifiers, "naming" : imageService.naming
         });
     };
 } ]);

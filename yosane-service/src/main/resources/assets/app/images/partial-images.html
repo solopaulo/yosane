@@ -1,9 +1,10 @@
 
-<div class="col-md-12 text-left form-group form-inline" style='margin-top:0.6em;'>
+<div class="col-md-12 text-left form-group" style='margin-top:0.6em;'>
   <label for="naming" class="label label-info">Name</label>
   <input id="naming" type="text" size="25" placeholder="Enter a name for the collection"
-    class="form-control" ng-model="naming"/>
-   <button class="form-control btn btn-danger" ng-click="clearImages()">Reset</button>
+    class="form-control" ng-model="is.naming"/>
+    <button class="form-control btn btn-info" style='width:80%' ng-click="selectAll()">Select All</button>
+   <a href="" class="text-danger form-inline pull-right" ng-click="doReset()">Reset</a>
  </div>
  
 </div>
@@ -20,13 +21,13 @@
    </div> <a href=""> <img ng-click="toggleSelected($index)" ng-src="{{image._links.imageDownloadThumb[0].href}}" />
   </a>
    <div class="caption text-center"></div>
-   <a href>
+   <a href title="Rotate Counter Clockwise 90 deg">
     <span class="glyphicon glyphicon-repeat mirrored pull-left"></span>
     </a>
-    <a href>
+    <a href title="Rotate Clockwise 90 deg">
     <span class="glyphicon glyphicon-repeat pull-right"></span>
     </a>
-    OH AYE!
+    <button class="btn btn-warning" ng-click="previewImage(image._links.imageDownload[0].href)">Preview</button>
   </li>
  </ul>
 
@@ -62,9 +63,8 @@
         <strong class="text-danger">COPY FILES</strong>
     </li>
     <li ng-repeat="pathconf in cs.localPaths">
-       <a href="#" ng-click="localFileCopyImages(pathconf.path)">
+       <a href="#" ng-click="localFileCopyImages(pathconf.path)" title="{{pathconf.path}}">
         <strong>{{pathconf.name}}</strong>
-        <h5>{{pathconf.path}}</h5>
        </a>
     </li>
    </ul>
